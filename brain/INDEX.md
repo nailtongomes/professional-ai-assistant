@@ -52,6 +52,8 @@ Responsabilidades permanentes ou contínuas.
 Conhecimento reutilizável, referências e documentação.
 - **Consulte** para apoiar decisão e execução.
 - **Grave** aqui quando o material servir a mais de um projeto.
+- `40-resources/automation/workflows/` cataloga os workflows externos que o
+  agente pode invocar. Workflow fora do catálogo não é executado.
 
 ### `50-people/`
 Contexto sobre pessoas relevantes para a vida profissional.

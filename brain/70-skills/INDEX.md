@@ -98,6 +98,19 @@ When to use:
 Quando o usuário pedir para criar, consultar, alterar ou cancelar compromisso,
 reunião, evento ou outro item explicitamente relacionado à agenda.
 
+## invoke-workflow
+
+Description:
+Executa workflows externos previamente registrados usando contratos HTTP
+declarados.
+
+Path:
+automation/invoke-workflow/SKILL.md
+
+When to use:
+Quando o usuário pedir execução de automação disponível em n8n, Kestra, API
+interna ou outro serviço externo previamente registrado.
+
 ## Manutenção
 
 Ao adicionar uma Skill: crie `<categoria>/<nome>/SKILL.md` **e** registre a
