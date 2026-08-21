@@ -45,6 +45,8 @@ Projetos com objetivo definido e possibilidade de conclusão.
 Responsabilidades permanentes ou contínuas.
 - **Consulte** para gestão recorrente.
 - **Grave** aqui quando o tema for mantido, não concluído.
+- `30-areas/agenda/` guarda os compromissos (um arquivo por mês em `events/`)
+  e a configuração de timezone.
 
 ### `40-resources/`
 Conhecimento reutilizável, referências e documentação.

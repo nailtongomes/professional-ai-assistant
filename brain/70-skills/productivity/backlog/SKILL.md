@@ -37,6 +37,7 @@ merece ser lembrado, backlog é o destino provável.
 | "Coloca instalar Syncthing no backlog do assistente pessoal."     | `backlog`        |
 | "Adiciona instalar Syncthing como **próxima ação** do projeto."   | `manage-project` |
 | "Anota estudar MCP." (sem sinal de fila)                          | `organize-brain` |
+| "Reunião com Henrique amanhã às 14h."                             | `agenda`         |
 
 Respeite a intenção explícita. Quando o usuário disser "backlog", é esta Skill,
 mesmo que o item pareça uma próxima ação. Quando disser "próxima ação", é

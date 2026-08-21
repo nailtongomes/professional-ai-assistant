@@ -86,20 +86,17 @@ When to use:
 Quando o usuário pedir para colocar algo no backlog, guardar para depois, lembrar
 de avaliar, pesquisar ou fazer futuramente.
 
-<!--
-Exemplo de entrada, para referência de formato (não é uma Skill ativa):
-
 ## agenda
 
 Description:
-Gerencia compromissos e eventos.
+Gerencia compromissos pessoais e profissionais armazenados em Markdown.
 
 Path:
-personal/agenda/SKILL.md
+productivity/agenda/SKILL.md
 
 When to use:
-Quando o usuário pedir para consultar, criar ou alterar compromissos.
--->
+Quando o usuário pedir para criar, consultar, alterar ou cancelar compromisso,
+reunião, evento ou outro item explicitamente relacionado à agenda.
 
 ## Manutenção
 
