@@ -1,0 +1,25 @@
+# Environment and secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Runtime/session artifacts
+runtime/
+logs/
+sessions/
+cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS/Linux noise
+.DS_Store
+
+# Obsidian local settings
+.obsidian/
