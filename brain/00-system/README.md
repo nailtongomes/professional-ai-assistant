@@ -13,7 +13,7 @@ diretório, além de `70-skills/`, cujo conteúdo é tratado como **instrução*
 | Arquivo               | Conteúdo                                              |
 | --------------------- | ----------------------------------------------------- |
 | `agent-rules.md`      | regras de execução, risco, segurança e governança     |
-| `PHILOSOPHY.md`       | postura de comunicação: breve, direta e precisa por padrão |
+| `PHILOSOPHY.md`       | princípios do assistente e postura de comunicação     |
 | `conventions.md`      | padrão de arquivos, nomes, datas e frontmatter        |
 | `taxonomy.md`         | classificação PARA adaptada e regras de desempate     |
 | `runtime-contract.md` | o mínimo que um runtime precisa fornecer              |

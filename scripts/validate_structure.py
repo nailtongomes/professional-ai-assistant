@@ -143,6 +143,30 @@ def check_skills(brain: Path) -> list[str]:
     return errors
 
 
+def check_workflows(brain: Path) -> list[str]:
+    """Se houver catálogo de workflows, ele precisa de índice e de registro."""
+    errors = []
+    wf_dir = brain / "40-resources" / "automation" / "workflows"
+    if not wf_dir.is_dir():
+        return errors
+
+    index_path = wf_dir / "INDEX.md"
+    if not index_path.is_file():
+        return [f"catálogo de workflows sem índice: {index_path.relative_to(brain)}"]
+
+    index_text = index_path.read_text(encoding="utf-8")
+    for wf in sorted(wf_dir.glob("*.md")):
+        if wf.name == "INDEX.md":
+            continue
+        declared_example = "status: example" in wf.read_text(encoding="utf-8")
+        listed = wf.name in index_text
+        if not listed and not declared_example:
+            errors.append(
+                f"workflow não registrado em INDEX.md e não marcado como exemplo: {wf.name}"
+            )
+    return errors
+
+
 def check_paths(brain: Path) -> list[str]:
     """Convenções básicas: kebab-case e ausência de paths absolutos do host."""
     warnings = []
@@ -159,7 +183,8 @@ def check_paths(brain: Path) -> list[str]:
 def validate(brain: Path) -> tuple[list[str], list[str]]:
     if not brain.is_dir():
         return [f"diretório do brain não encontrado: {brain}"], []
-    errors = check_required(brain) + check_secrets(brain) + check_skills(brain)
+    errors = (check_required(brain) + check_secrets(brain)
+              + check_skills(brain) + check_workflows(brain))
     return errors, check_paths(brain)
 
 

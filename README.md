@@ -27,6 +27,12 @@ Separar as camadas e deixar apenas a última descartável:
 | `data`    | `brain/60-memory/` e demais diretórios | não — é seu |
 | `tools`   | nomes conceituais em `brain/00-system/runtime-contract.md` | implementação sim, contrato não |
 | `runtime` | fora do repositório    | **sim, totalmente** |
+| `secrets` | ambiente / secret manager (`.env`, nunca versionado) | sim — e nunca dentro de `brain/` |
+
+As quatro camadas nunca se misturam no disco: `brain/` é versionado e portátil;
+`runtime/`, `logs/`, `sessions/` e `cache/` são artefatos descartáveis e estão no
+`.gitignore`; as tools existem como contrato conceitual, não como código aqui; os
+secrets vivem só no ambiente.
 
 **Princípio arquitetural central:** o harness é substituível. Se o runtime for
 completamente removido, nenhuma Skill, memória, decisão ou metodologia se perde.
@@ -83,10 +89,15 @@ second-brain-agent/
 │   ├── 10-inbox/                 # não classificado (destino em caso de dúvida)
 │   ├── 20-projects/              # objetivo definido, com conclusão possível
 │   ├── 30-areas/                 # responsabilidades contínuas
+│   │   └── agenda/               # compromissos (events/YYYY-MM.md) + timezone
 │   ├── 40-resources/             # conhecimento reutilizável
+│   │   └── automation/workflows/ # catálogo de workflows externos (INDEX.md)
 │   ├── 50-people/                # contexto sobre pessoas
 │   ├── 60-memory/                # profile, preferences, decisions, lessons
 │   ├── 70-skills/                # INDEX.md + contrato de Skills
+│   │   ├── system/organize-brain/
+│   │   ├── productivity/{manage-project,backlog,agenda}/
+│   │   └── automation/invoke-workflow/
 │   └── 90-archive/               # encerrado / inativo
 └── scripts/
     ├── bootstrap.sh              # gera uma instância operacional do brain
@@ -184,6 +195,15 @@ Telegram → consultar processo
 Banco de dados, vector database, embeddings, RAG, Redis, filas, Kubernetes,
 frameworks de agentes e dependências grandes. Filesystem + Markdown + dois scripts
 de biblioteca padrão são suficientes para inaugurar a metodologia.
+
+## Próximos passos
+
+Nada disso está implementado, e cada item é um PR próprio:
+
+1. runtime que cumpra `brain/00-system/runtime-contract.md` (Nanobot como primeiro candidato);
+2. canal de entrada (Telegram ou equivalente);
+3. workflows reais registrados em `brain/40-resources/automation/workflows/`;
+4. Skills adicionais conforme a necessidade aparecer — nunca antes.
 
 ## Licença
 

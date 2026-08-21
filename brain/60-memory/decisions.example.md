@@ -30,7 +30,7 @@ Context:
 Varrer o filesystem inteiro consome contexto e é imprevisível.
 
 Decision:
-Todo acesso começa por `brain/INDEX.md` e `brain/70-skills/INDEX.md`.
+Todo acesso começa por `INDEX.md` e `70-skills/INDEX.md`.
 
 Reason:
 Progressive disclosure mantém o custo de leitura baixo e previsível.

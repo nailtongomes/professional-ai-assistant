@@ -229,7 +229,7 @@ precisa confirmar aquela execução, sabendo o que ela faz.
 
 Workflow falhou ou está indisponível → pare. Não tente a mesma tarefa por shell,
 browser, outro endpoint, outra API ou workflow semelhante, salvo instrução
-explícita de outra Skill (`agent-rules.md`, regra 20).
+explícita de outra Skill (`00-system/agent-rules.md`, regra 20).
 
 ```text
 Não executei. Workflow indisponível.

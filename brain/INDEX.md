@@ -14,11 +14,13 @@ destino, abra só o necessário.
 ## Ordem de leitura para um agente
 
 ```text
-1. brain/INDEX.md              (este arquivo — onde está cada coisa)
-2. brain/00-system/agent-rules.md  (o que pode e o que não pode ser feito)
-   brain/00-system/PHILOSOPHY.md   (como responder: breve, direto, preciso)
-3. brain/70-skills/INDEX.md    (existe Skill para o pedido?)
+1. INDEX.md                    (este arquivo — onde está cada coisa)
+2. 00-system/agent-rules.md    (o que pode e o que não pode ser feito)
+   00-system/PHILOSOPHY.md     (princípios e como responder)
+3. 70-skills/INDEX.md          (existe Skill para o pedido?)
 4. o SKILL.md selecionado      (como executar)
+
+Todos os paths deste brain são relativos a este diretório.
 ```
 
 Sem Skill adequada: **não executar**. Ver `00-system/agent-rules.md`.
