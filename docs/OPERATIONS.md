@@ -126,16 +126,81 @@ Processo existir não é saúde: o gateway é consultado pelo comando oficial.
 `N8N_BASE_URL` vem sempre do ambiente. O domínio real aparece só no
 `.env.example`, nunca na lógica.
 
-## tests.n3wizards.com — ainda não configurado
+## Repositório público vs. configuração privada
 
-Domínio reservado para o assistente. **Nada de nginx, Caddy, DNS ou TLS foi
+Este repositório é público. A regra é simples:
+
+```text
+Git público  =  sem domínios reais, sem endpoints, sem webhooks, sem secrets
+```
+
+O que fica versionado são **nomes de variáveis e contratos**. O que fica na VPS
+são os valores:
+
+```text
+/etc/professional-ai-assistant/assistant.env   (0600, root, fora do Git)
+```
+
+Como o valor chega até a Skill:
+
+```text
+Skill
+  │ usa
+  ▼
+{{PROCESS_QUERY_ENDPOINT}}
+  │ resolvido pelo runtime, que carregou o assistant.env
+  ▼
+URL real
+```
+
+Nenhuma Skill conhece o domínio. Nenhum arquivo do brain conhece o endpoint. O
+runtime carrega o env, resolve os nomes e faz a chamada — e é o único ponto onde
+o valor real existe.
+
+O **path do webhook também é sensível**: revela nome interno de fluxo e ajuda
+quem quiser sondar a automação. Por isso cada workflow usa uma variável de
+endpoint **completo**, em vez de base + path concatenados. Isso também deixa
+mover um workflow de host sem tocar em arquivo versionado.
+
+### Configurar um endpoint na VPS
+
+Idempotente — remove a linha anterior antes de acrescentar, para não duplicar:
+
+```bash
+sudo sed -i '/^PROCESS_QUERY_ENDPOINT=/d' /etc/professional-ai-assistant/assistant.env
+echo 'PROCESS_QUERY_ENDPOINT=https://SEU-ENDPOINT-PRIVADO' \
+  | sudo tee -a /etc/professional-ai-assistant/assistant.env >/dev/null
+sudo chmod 600 /etc/professional-ai-assistant/assistant.env
+sudo ./scripts/healthcheck.sh
+```
+
+Rodar duas vezes deixa uma linha só. O mesmo vale para `N8N_BASE_URL`,
+`SEND_EMAIL_ENDPOINT` e os demais.
+
+Nunca cole o valor real em issue, PR, commit ou arquivo do brain.
+
+### Nunca commitar
+
+```text
+domínio privado    webhook real    API key    token
+password           certificado     cookie     session    credencial
+```
+
+O teste `nenhum host privado versionado`, em `tests/run-local-tests.sh`, varre
+`scripts/`, `config/`, `brain/`, `docs/` e `.env.example` procurando qualquer
+host fora da allowlist pública. Ele roda junto com a suíte.
+
+## Domínio do assistente — ainda não configurado
+
+O domínio pretendido fica em `ASSISTANT_DOMAIN`, no `assistant.env` da VPS —
+nunca neste repositório, que é público. **Nada de nginx, Caddy, DNS ou TLS foi
 tocado nesta etapa**, por decisão.
 
 O que falta, antes de expor qualquer coisa:
 
 1. **Reverse proxy** — a WebUI do Nanobot escuta em `http://127.0.0.1:8765`.
    Deve continuar ligada só ao loopback; quem fala com a internet é o proxy.
-2. **TLS** — certificado válido para `tests.n3wizards.com`, renovação
+2. **TLS** — certificado válido para o domínio configurado, renovação
    automática, HTTP redirecionando para HTTPS.
 3. **Autenticação obrigatória** — o Nanobot **não pode** ser exposto sem
    autenticação. Quem alcança a WebUI alcança o brain inteiro e as ferramentas
@@ -148,8 +213,8 @@ Até que os cinco existam, o acesso é local ou por túnel SSH.
 
 ## Legacy VPS cleanup
 
-A VPS pode ter serviços de projetos anteriores. O objetivo futuro é dedicar
-`tests.n3wizards.com` a este projeto — mas **limpeza é etapa humana separada**, e
+A VPS pode ter serviços de projetos anteriores. O objetivo futuro é dedicar o
+domínio do assistente a este projeto — mas **limpeza é etapa humana separada**, e
 nenhum script deste repositório remove nada da VPS.
 
 Antes de remover qualquer coisa, audite e anote o que encontrar:

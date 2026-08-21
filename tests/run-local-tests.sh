@@ -164,7 +164,16 @@ printf '\n== segurança ==\n'
 # Ignora comentários: o que importa é o código executável.
 code_only() { grep -rhv '^[[:space:]]*#' "$REPO"/scripts/*.sh "$REPO"/scripts/lib/*.sh; }
 export -f code_only
-check_fails "domínio n8n fora do .env.example" bash -c "code_only 2>/dev/null | grep -q 'n8n\.n3wizards\.com'"
+# O repositório é público: nenhum domínio, endpoint ou webhook privado pode
+# estar versionado. A allowlist cobre só o que é público e legítimo.
+check_fails "nenhum host privado versionado" bash -c '
+  grep -rhoE "https?://[A-Za-z0-9.-]+" "$0"/scripts "$0"/config "$0"/brain "$0"/docs "$0"/.env.example 2>/dev/null \
+    | sort -u \
+    | grep -vE "^https://(raw\.githubusercontent\.com|github\.com|json-schema\.org|automation\.example\.com|example\.com|SEU-ENDPOINT-PRIVADO)$" \
+    | grep -vE "^http://(127\.0\.0\.1|localhost)$" \
+    | grep -q .' "$REPO"
+check_fails "nenhum valor preenchido no .env.example" \
+  bash -c "grep -E '^(ASSISTANT_DOMAIN|ASSISTANT_BASE_URL|N8N_BASE_URL|KESTRA_BASE_URL|.*_ENDPOINT|.*_API_KEY|.*_TOKEN)=.+' '$REPO/.env.example' | grep -q ."
 check_fails "rm -rf fora de safe_remove"       bash -c "code_only | grep -E 'rm -rf' | grep -qv 'safe_remove'"
 check_fails "git reset --hard"                 bash -c "code_only | grep -q 'reset --hard'"
 check_fails "rsync --delete"                   bash -c "code_only | grep -q 'rsync.*--delete'"

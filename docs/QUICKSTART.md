@@ -26,6 +26,10 @@ sudo nano /etc/professional-ai-assistant/assistant.env
 sudo ./scripts/healthcheck.sh
 ```
 
+Esse arquivo é o único lugar onde domínios, endpoints e credenciais existem — o
+repositório é público e só versiona nomes de variáveis. Ver
+[OPERATIONS](OPERATIONS.md#repositório-público-vs-configuração-privada).
+
 Idempotente: rodar de novo não duplica nada e não toca no brain existente.
 
 ## 2. Atualizar
