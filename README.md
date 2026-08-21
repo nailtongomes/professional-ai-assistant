@@ -7,6 +7,10 @@ Este repositório é **metodologia + template + documentação + Skills reutiliz
 Ele não é o repositório dos seus dados pessoais reais — esses vivem em uma
 instância gerada por `scripts/bootstrap.sh`, fora daqui.
 
+>  **Comandos essenciais: [docs/QUICKSTART.md](docs/QUICKSTART.md)** — instalar,
+> atualizar, baixar uma cópia do brain, levar para outra máquina e replicar para
+> um novo cliente.
+
 > Estado atual: apenas a fundação. Nenhum agente, canal ou integração
 > (Nanobot, Telegram, n8n, Kestra) foi implementado.
 
@@ -99,10 +103,39 @@ second-brain-agent/
 │   │   ├── productivity/{manage-project,backlog,agenda}/
 │   │   └── automation/invoke-workflow/
 │   └── 90-archive/               # encerrado / inativo
-└── scripts/
-    ├── bootstrap.sh              # gera uma instância operacional do brain
-    └── validate_structure.py     # valida estrutura e ausência de secrets
+├── config/
+│   └── managed-paths.txt         # fronteira entre template e dados do usuário
+├── docs/                         # QUICKSTART, INSTALL, UPDATE, BACKUP, RESTORE, OPERATIONS
+├── scripts/
+│   ├── bootstrap.sh              # gera uma instância operacional do brain
+│   ├── install.sh                # instala a camada operacional (idempotente)
+│   ├── update.sh                 # template + gerenciados + runtime, com backup
+│   ├── sync.sh                   # só arquivos gerenciados; conflito não sobrescreve
+│   ├── backup.sh                 # brain, manifestos, metadados de versão
+│   ├── restore.sh                # restauração com confirmação e backup prévio
+│   ├── healthcheck.sh            # Nanobot, brain, permissões, n8n
+│   ├── validate_structure.py     # valida estrutura e ausência de secrets
+│   └── lib/common.sh             # log, dry-run, lock, validação de path
+└── tests/
+    └── run-local-tests.sh        # suíte local, em diretório temporário
 ```
+
+## Ciclo de vida operacional
+
+```bash
+sudo ./scripts/install.sh --dry-run && sudo ./scripts/install.sh
+sudo ./scripts/update.sh  --dry-run && sudo ./scripts/update.sh
+sudo ./scripts/backup.sh
+sudo ./scripts/healthcheck.sh
+```
+
+Atalho com tudo que importa — incluindo como baixar uma cópia do brain e
+replicar a instalação para outra máquina ou outro cliente:
+**[docs/QUICKSTART.md](docs/QUICKSTART.md)**.
+
+Tudo é idempotente e aceita `--dry-run`. Update sempre faz backup antes; sem
+backup, sem update. O brain nunca é apagado, e `config/managed-paths.txt` define
+o que o template pode tocar — o resto é seu. Detalhes em `docs/`.
 
 Um agente novo deve começar por `brain/INDEX.md` e `brain/70-skills/INDEX.md`.
 Esses dois arquivos bastam para entender a metodologia — sem varrer o filesystem.
@@ -200,7 +233,7 @@ de biblioteca padrão são suficientes para inaugurar a metodologia.
 
 Nada disso está implementado, e cada item é um PR próprio:
 
-1. runtime que cumpra `brain/00-system/runtime-contract.md` (Nanobot como primeiro candidato);
+1. executar a instalação real na VPS, seguindo `docs/INSTALL.md`;
 2. canal de entrada (Telegram ou equivalente);
 3. workflows reais registrados em `brain/40-resources/automation/workflows/`;
 4. Skills adicionais conforme a necessidade aparecer — nunca antes.
