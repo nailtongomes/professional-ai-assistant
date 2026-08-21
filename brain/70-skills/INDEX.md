@@ -46,6 +46,8 @@ When to use:
 | `productivity/` | gestão de projetos, backlog e execução pessoal |
 | `professional/` | trabalho, clientes, processos                 |
 | `automation/` | disparo de workflows externos (n8n, Kestra)     |
+| `legal/`      | processos judiciais e consultas por identificador |
+| `communication/` | e-mail e demais canais de saída              |
 
 ## Skills registradas
 
@@ -110,6 +112,41 @@ automation/invoke-workflow/SKILL.md
 When to use:
 Quando o usuário pedir execução de automação disponível em n8n, Kestra, API
 interna ou outro serviço externo previamente registrado.
+
+## process-query
+
+Description:
+Roteia consultas rápidas e cópias integrais de processos judiciais para
+automações externas.
+
+Path:
+legal/process-query/SKILL.md
+
+When to use:
+Quando o usuário pedir consulta, movimentações, documentos ou cópia integral de
+processo judicial.
+
+## person-search
+
+Description:
+Roteia consultas por CPF, CNPJ ou OAB para automações externas.
+
+Path:
+legal/person-search/SKILL.md
+
+When to use:
+Quando o usuário pedir pesquisa relacionada a CPF, CNPJ ou inscrição OAB.
+
+## send-email
+
+Description:
+Roteia envio de e-mails por workflow externo.
+
+Path:
+communication/send-email/SKILL.md
+
+When to use:
+Quando o usuário pedir envio de e-mail.
 
 ## Manutenção
 

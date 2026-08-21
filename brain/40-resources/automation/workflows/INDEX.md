@@ -39,13 +39,46 @@ Risk:
 low | medium | high
 ```
 
+## Endpoints
+
+Cada workflow declara uma **variável de endpoint completo**, resolvida em runtime
+a partir de `/etc/professional-ai-assistant/assistant.env`, na VPS.
+
+```text
+Skill  →  {{PROCESS_QUERY_ENDPOINT}}  →  runtime resolve  →  URL real
+```
+
+Nem o domínio nem o path do webhook são versionados: este repositório é público,
+e o nome interno de um webhook também é informação de infraestrutura. O runtime
+não concatena base + path — a variável já carrega a URL inteira, o que permite
+mover um workflow de host sem tocar em arquivo versionado.
+
 ## Workflows registrados
 
-_Nenhum workflow real registrado._
+_Nenhum workflow ativo._
 
-O arquivo `exemplo-consultar-processo.md` existe apenas como referência de
-formato e **não deve ser invocado**: seu endpoint não aponta para nenhum serviço
-real. Registre workflows reais aqui, um por arquivo.
+Os arquivos abaixo declaram contratos com `status: placeholder`: o formato está
+definido, o endpoint ainda não foi provisionado. Enquanto estiverem assim, a
+regra `UNKNOWN WORKFLOW = NO ACTION` os mantém fora de execução.
+
+| Arquivo | Endpoint | Risco | Usado por |
+| ------- | -------- | ----- | --------- |
+| `consultar-processo.md` | `{{PROCESS_QUERY_ENDPOINT}}` | low | `process-query` |
+| `copiar-processo-integral.md` | `{{PROCESS_COPY_ENDPOINT}}` | low | `process-query` |
+| `consultar-documento.md` | `{{PERSON_SEARCH_ENDPOINT}}` | low | `person-search` |
+| `enviar-email.md` | `{{SEND_EMAIL_ENDPOINT}}` | medium | `send-email` |
+
+`exemplo-consultar-processo.md` é só referência de formato e não deve ser
+invocado.
+
+### Ativar um workflow
+
+1. provisione o fluxo na automação;
+2. preencha a variável de endpoint no `assistant.env` da VPS;
+3. mude `status: placeholder` para `status: active` no arquivo do workflow;
+4. registre-o na tabela acima.
+
+Sem os quatro passos, o agente não executa.
 
 ## Manutenção
 

@@ -40,7 +40,11 @@ cat .env.example
 
 O `install.sh` cria `/etc/professional-ai-assistant/assistant.env` a partir do
 exemplo, com permissão `0600`, e **nunca sobrescreve** um arquivo existente.
-Preencha os valores reais só ali — nunca no Git, nunca em `brain/`.
+
+O `.env.example` vem com todos os valores vazios, de propósito: o repositório é
+público. Domínios, endpoints de workflow, webhooks e credenciais só existem no
+arquivo da VPS — nunca no Git, nunca em `brain/`. Ver
+[OPERATIONS](OPERATIONS.md#repositório-público-vs-configuração-privada).
 
 ### 5. Dry-run
 
@@ -83,7 +87,8 @@ Telegram e afins só depois que o assistente estiver saudável localmente.
 
 ### 10. Exposição web (por último)
 
-`tests.n3wizards.com` ainda **não** é configurado. Ver `OPERATIONS.md`.
+O domínio do assistente (`ASSISTANT_DOMAIN`) ainda **não** é configurado.
+Ver `OPERATIONS.md`.
 
 ## Trust boundary: `curl | sh`
 
