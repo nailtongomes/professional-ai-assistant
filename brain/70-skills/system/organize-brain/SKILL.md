@@ -23,7 +23,8 @@ Gatilhos típicos:
 ```
 
 Não use esta Skill para consultar, resumir, arquivar ou mover conteúdo já
-existente — isso pertence a outras Skills.
+existente — isso pertence a outras Skills. Quando o pedido for explicitamente
+sobre um projeto (criar, consultar, atualizar, concluir), use `manage-project`.
 
 ## Goal
 

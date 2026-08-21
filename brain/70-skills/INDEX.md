@@ -43,6 +43,7 @@ When to use:
 | ------------- | ----------------------------------------------- |
 | `system/`     | manutenção do próprio brain                     |
 | `personal/`   | vida pessoal (agenda, hábitos, finanças)        |
+| `productivity/` | gestão de projetos, backlog e execução pessoal |
 | `professional/` | trabalho, clientes, processos                 |
 | `automation/` | disparo de workflows externos (n8n, Kestra)     |
 
@@ -60,6 +61,18 @@ system/organize-brain/SKILL.md
 When to use:
 Quando o usuário pedir para anotar, registrar, guardar, organizar ou persistir
 uma informação sem indicar um procedimento especializado melhor.
+
+## manage-project
+
+Description:
+Gerencia criação, consulta, estado, backlog, decisões e notas de projetos.
+
+Path:
+productivity/manage-project/SKILL.md
+
+When to use:
+Quando o usuário pedir para criar, consultar ou atualizar um projeto, ou registrar
+informação explicitamente relacionada a um projeto.
 
 <!--
 Exemplo de entrada, para referência de formato (não é uma Skill ativa):
