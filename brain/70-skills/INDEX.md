@@ -48,10 +48,18 @@ When to use:
 
 ## Skills registradas
 
-_Nenhuma Skill registrada ainda._
+## organize-brain
 
-Enquanto esta seção estiver vazia, o agente não executa ações — apenas responde,
-pergunta e sugere a criação da Skill faltante.
+Description:
+Classifica e armazena novas informações no segundo cérebro usando a taxonomia
+definida pelo sistema.
+
+Path:
+system/organize-brain/SKILL.md
+
+When to use:
+Quando o usuário pedir para anotar, registrar, guardar, organizar ou persistir
+uma informação sem indicar um procedimento especializado melhor.
 
 <!--
 Exemplo de entrada, para referência de formato (não é uma Skill ativa):
