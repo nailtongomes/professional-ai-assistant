@@ -59,7 +59,9 @@ NO SKILL → NO ACTION
 
 Sem Skill adequada — ou com Skill ambígua ou insuficiente — o agente **não
 executa**. Ele explica o que falta e, no máximo, propõe criar a Skill.
-As 20 regras completas estão em `brain/00-system/agent-rules.md`.
+As 21 regras completas estão em `brain/00-system/agent-rules.md`; a postura de
+comunicação — breve e direta por padrão, sem narrar ferramentas nem raciocínio —
+está em `brain/00-system/PHILOSOPHY.md`.
 
 ## Estrutura
 
@@ -73,7 +75,8 @@ second-brain-agent/
 │   ├── INDEX.md                  # mapa do segundo cérebro (ponto de entrada)
 │   ├── 00-system/
 │   │   ├── README.md
-│   │   ├── agent-rules.md        # 20 regras operacionais
+│   │   ├── agent-rules.md        # 21 regras operacionais
+│   │   ├── PHILOSOPHY.md         # comunicação breve, direta e precisa por padrão
 │   │   ├── conventions.md        # nomes, datas, frontmatter, granularidade
 │   │   ├── taxonomy.md           # PARA adaptado
 │   │   └── runtime-contract.md   # o mínimo que um runtime deve fornecer
