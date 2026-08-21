@@ -1,0 +1,45 @@
+# Arquivos e diretórios GERENCIADOS pelo template.
+#
+# Só o que está listado aqui pode ser atualizado por scripts/sync.sh.
+# Todo o resto do brain é USER DATA e nunca é tocado por um update —
+# inbox, projetos, agenda, pessoas, memória, notas, backlogs e Skills locais.
+#
+# Paths são relativos à raiz do brain. Um path terminado em "/" é um
+# diretório e vale recursivamente.
+#
+# Por que um manifesto em vez de separar 70-skills/ em managed/ e local/:
+# a separação por diretório quebraria os índices e os paths já publicados nas
+# Skills existentes, e obrigaria o usuário a decidir a categoria de cada Skill
+# nova. O manifesto entrega a mesma garantia — "o que não está aqui não é
+# tocado" — sem mexer na estrutura. Skills pessoais vivem lado a lado com as
+# gerenciadas e ficam protegidas por omissão, que é o padrão seguro.
+
+# --- Regras e metodologia do sistema ---
+INDEX.md
+00-system/README.md
+00-system/PHILOSOPHY.md
+00-system/agent-rules.md
+00-system/conventions.md
+00-system/taxonomy.md
+00-system/runtime-contract.md
+
+# --- Contrato e índice de Skills ---
+70-skills/README.md
+70-skills/INDEX.md
+
+# --- Skills oficiais (uma linha por Skill; as não listadas são locais) ---
+70-skills/system/organize-brain/
+70-skills/productivity/manage-project/
+70-skills/productivity/backlog/
+70-skills/productivity/agenda/
+70-skills/automation/invoke-workflow/
+
+# --- Templates e exemplos de memória (não os arquivos operacionais) ---
+60-memory/README.md
+60-memory/profile.example.md
+60-memory/preferences.example.md
+60-memory/decisions.example.md
+60-memory/lessons.example.md
+
+# --- Catálogo de automação: só o exemplo e o cabeçalho do índice ---
+40-resources/automation/workflows/exemplo-consultar-processo.md
