@@ -43,30 +43,73 @@ When to use:
 | ------------- | ----------------------------------------------- |
 | `system/`     | manutenção do próprio brain                     |
 | `personal/`   | vida pessoal (agenda, hábitos, finanças)        |
+| `productivity/` | gestão de projetos, backlog e execução pessoal |
 | `professional/` | trabalho, clientes, processos                 |
 | `automation/` | disparo de workflows externos (n8n, Kestra)     |
 
 ## Skills registradas
 
-_Nenhuma Skill registrada ainda._
+## organize-brain
 
-Enquanto esta seção estiver vazia, o agente não executa ações — apenas responde,
-pergunta e sugere a criação da Skill faltante.
+Description:
+Classifica e armazena novas informações no segundo cérebro usando a taxonomia
+definida pelo sistema.
 
-<!--
-Exemplo de entrada, para referência de formato (não é uma Skill ativa):
+Path:
+system/organize-brain/SKILL.md
+
+When to use:
+Quando o usuário pedir para anotar, registrar, guardar, organizar ou persistir
+uma informação sem indicar um procedimento especializado melhor.
+
+## manage-project
+
+Description:
+Gerencia criação, consulta, estado, backlog, decisões e notas de projetos.
+
+Path:
+productivity/manage-project/SKILL.md
+
+When to use:
+Quando o usuário pedir para criar, consultar ou atualizar um projeto, ou registrar
+informação explicitamente relacionada a um projeto.
+
+## backlog
+
+Description:
+Registra rapidamente itens para lembrar, avaliar, pesquisar ou fazer depois.
+
+Path:
+productivity/backlog/SKILL.md
+
+When to use:
+Quando o usuário pedir para colocar algo no backlog, guardar para depois, lembrar
+de avaliar, pesquisar ou fazer futuramente.
 
 ## agenda
 
 Description:
-Gerencia compromissos e eventos.
+Gerencia compromissos pessoais e profissionais armazenados em Markdown.
 
 Path:
-personal/agenda/SKILL.md
+productivity/agenda/SKILL.md
 
 When to use:
-Quando o usuário pedir para consultar, criar ou alterar compromissos.
--->
+Quando o usuário pedir para criar, consultar, alterar ou cancelar compromisso,
+reunião, evento ou outro item explicitamente relacionado à agenda.
+
+## invoke-workflow
+
+Description:
+Executa workflows externos previamente registrados usando contratos HTTP
+declarados.
+
+Path:
+automation/invoke-workflow/SKILL.md
+
+When to use:
+Quando o usuário pedir execução de automação disponível em n8n, Kestra, API
+interna ou outro serviço externo previamente registrado.
 
 ## Manutenção
 

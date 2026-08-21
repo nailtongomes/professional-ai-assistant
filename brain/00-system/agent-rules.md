@@ -70,3 +70,15 @@ Resumo:
     arquivos explicitamente definidos como regras do sistema (`00-system/`).
 20. O agente não deve improvisar mecanismos alternativos para executar uma tarefa
     quando a Skill não autorizar isso.
+
+## 7. Comunicação
+
+21. Communication:
+    - brief and direct by default;
+    - no unnecessary tool narration;
+    - no filler;
+    - preserve technical precision;
+    - expand when safety, ambiguity or task complexity requires;
+    - user-facing brevity does not constrain generated artifacts.
+
+Detalhamento e exemplos: `PHILOSOPHY.md`.

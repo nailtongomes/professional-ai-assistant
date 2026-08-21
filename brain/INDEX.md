@@ -14,10 +14,13 @@ destino, abra só o necessário.
 ## Ordem de leitura para um agente
 
 ```text
-1. brain/INDEX.md              (este arquivo — onde está cada coisa)
-2. brain/00-system/agent-rules.md  (o que pode e o que não pode ser feito)
-3. brain/70-skills/INDEX.md    (existe Skill para o pedido?)
+1. INDEX.md                    (este arquivo — onde está cada coisa)
+2. 00-system/agent-rules.md    (o que pode e o que não pode ser feito)
+   00-system/PHILOSOPHY.md     (princípios e como responder)
+3. 70-skills/INDEX.md          (existe Skill para o pedido?)
 4. o SKILL.md selecionado      (como executar)
+
+Todos os paths deste brain são relativos a este diretório.
 ```
 
 Sem Skill adequada: **não executar**. Ver `00-system/agent-rules.md`.
@@ -25,7 +28,7 @@ Sem Skill adequada: **não executar**. Ver `00-system/agent-rules.md`.
 ## Diretórios
 
 ### `00-system/`
-Regras, convenções, taxonomia e contrato de runtime.
+Regras, convenções, filosofia de comunicação, taxonomia e contrato de runtime.
 - **Consulte** sempre, antes de qualquer ação.
 - **Grave** apenas quando regras mudarem de forma explícita.
 - Tratado como **instrução**.
@@ -44,11 +47,15 @@ Projetos com objetivo definido e possibilidade de conclusão.
 Responsabilidades permanentes ou contínuas.
 - **Consulte** para gestão recorrente.
 - **Grave** aqui quando o tema for mantido, não concluído.
+- `30-areas/agenda/` guarda os compromissos (um arquivo por mês em `events/`)
+  e a configuração de timezone.
 
 ### `40-resources/`
 Conhecimento reutilizável, referências e documentação.
 - **Consulte** para apoiar decisão e execução.
 - **Grave** aqui quando o material servir a mais de um projeto.
+- `40-resources/automation/workflows/` cataloga os workflows externos que o
+  agente pode invocar. Workflow fora do catálogo não é executado.
 
 ### `50-people/`
 Contexto sobre pessoas relevantes para a vida profissional.
