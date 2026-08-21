@@ -7,6 +7,10 @@ Este repositório é **metodologia + template + documentação + Skills reutiliz
 Ele não é o repositório dos seus dados pessoais reais — esses vivem em uma
 instância gerada por `scripts/bootstrap.sh`, fora daqui.
 
+>  **Comandos essenciais: [docs/QUICKSTART.md](docs/QUICKSTART.md)** — instalar,
+> atualizar, baixar uma cópia do brain, levar para outra máquina e replicar para
+> um novo cliente.
+
 > Estado atual: apenas a fundação. Nenhum agente, canal ou integração
 > (Nanobot, Telegram, n8n, Kestra) foi implementado.
 
@@ -101,7 +105,7 @@ second-brain-agent/
 │   └── 90-archive/               # encerrado / inativo
 ├── config/
 │   └── managed-paths.txt         # fronteira entre template e dados do usuário
-├── docs/                         # INSTALL, UPDATE, BACKUP, RESTORE, OPERATIONS
+├── docs/                         # QUICKSTART, INSTALL, UPDATE, BACKUP, RESTORE, OPERATIONS
 ├── scripts/
 │   ├── bootstrap.sh              # gera uma instância operacional do brain
 │   ├── install.sh                # instala a camada operacional (idempotente)
@@ -124,6 +128,10 @@ sudo ./scripts/update.sh  --dry-run && sudo ./scripts/update.sh
 sudo ./scripts/backup.sh
 sudo ./scripts/healthcheck.sh
 ```
+
+Atalho com tudo que importa — incluindo como baixar uma cópia do brain e
+replicar a instalação para outra máquina ou outro cliente:
+**[docs/QUICKSTART.md](docs/QUICKSTART.md)**.
 
 Tudo é idempotente e aceita `--dry-run`. Update sempre faz backup antes; sem
 backup, sem update. O brain nunca é apagado, e `config/managed-paths.txt` define
