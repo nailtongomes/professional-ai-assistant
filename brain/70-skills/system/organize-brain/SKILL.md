@@ -24,7 +24,8 @@ Gatilhos típicos:
 
 Não use esta Skill para consultar, resumir, arquivar ou mover conteúdo já
 existente — isso pertence a outras Skills. Quando o pedido for explicitamente
-sobre um projeto (criar, consultar, atualizar, concluir), use `manage-project`.
+sobre um projeto (criar, consultar, atualizar, concluir), use `manage-project`;
+quando for sobre guardar algo para depois, use `backlog`.
 
 ## Goal
 

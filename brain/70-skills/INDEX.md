@@ -74,6 +74,18 @@ When to use:
 Quando o usuário pedir para criar, consultar ou atualizar um projeto, ou registrar
 informação explicitamente relacionada a um projeto.
 
+## backlog
+
+Description:
+Registra rapidamente itens para lembrar, avaliar, pesquisar ou fazer depois.
+
+Path:
+productivity/backlog/SKILL.md
+
+When to use:
+Quando o usuário pedir para colocar algo no backlog, guardar para depois, lembrar
+de avaliar, pesquisar ou fazer futuramente.
+
 <!--
 Exemplo de entrada, para referência de formato (não é uma Skill ativa):
 

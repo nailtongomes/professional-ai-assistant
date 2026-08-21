@@ -40,8 +40,9 @@ O teste é simples: se não existe um estado "pronto" reconhecível, é área.
 `organize-brain` decide **onde** uma informação pertence no brain.
 `manage-project` atua quando o destino já é reconhecidamente um projeto.
 
-Se o pedido for genérico ("anota isso"), use `organize-brain`. Se houver Skill
-mais específica que ambas, ela prevalece.
+Se o pedido for genérico ("anota isso"), use `organize-brain`. Se o usuário disser
+explicitamente "backlog", use `backlog` — inclusive para backlog de projeto.
+Se houver Skill mais específica que essas, ela prevalece.
 
 ## Goal
 
