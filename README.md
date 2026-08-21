@@ -1,22 +1,35 @@
 # second-brain-agent
 
-Base portátil e independente de harness para um assistente pessoal/profissional orientado por Skills.
+Base **portátil e independente de harness** para um assistente pessoal e
+profissional orientado por Skills.
+
+Este repositório é **metodologia + template + documentação + Skills reutilizáveis**.
+Ele não é o repositório dos seus dados pessoais reais — esses vivem em uma
+instância gerada por `scripts/bootstrap.sh`, fora daqui.
+
+> Estado atual: apenas a fundação. Nenhum agente, canal ou integração
+> (Nanobot, Telegram, n8n, Kestra) foi implementado.
 
 ## O problema
 
-Assistentes de IA costumam guardar memória, regras e procedimentos dentro de runtimes específicos, gerando lock-in.
+Assistentes de IA costumam guardar memória, configuração e procedimentos **dentro
+do runtime**. Trocar de ferramenta significa perder ou migrar tudo: contexto,
+decisões, automações, método de trabalho. Isso é lock-in.
 
 ## A proposta
 
-Separar claramente:
+Separar as camadas e deixar apenas a última descartável:
 
-- `brain` (dados e organização)
-- `skills` (procedimentos)
-- `data` (memória em Markdown)
-- `runtime` (substituível)
-- `tools` (capacidades computacionais)
+| Camada    | Onde vive              | Substituível? |
+| --------- | ---------------------- | ------------- |
+| `brain`   | `brain/` (Markdown)    | não — é seu   |
+| `skills`  | `brain/70-skills/`     | não — é seu   |
+| `data`    | `brain/60-memory/` e demais diretórios | não — é seu |
+| `tools`   | nomes conceituais em `brain/00-system/runtime-contract.md` | implementação sim, contrato não |
+| `runtime` | fora do repositório    | **sim, totalmente** |
 
-Assim, o runtime só consome a estrutura; não é dono dela.
+**Princípio arquitetural central:** o harness é substituível. Se o runtime for
+completamente removido, nenhuma Skill, memória, decisão ou metodologia se perde.
 
 ## Modelo conceitual
 
@@ -38,70 +51,137 @@ Tools
 Filesystem / HTTP / External Automation
 ```
 
-## Princípio
+## Princípio operacional
 
 ```text
 NO SKILL → NO ACTION
 ```
 
-Sem Skill adequada, ambígua ou insuficiente, o agente deve recusar execução.
+Sem Skill adequada — ou com Skill ambígua ou insuficiente — o agente **não
+executa**. Ele explica o que falta e, no máximo, propõe criar a Skill.
+As 20 regras completas estão em `brain/00-system/agent-rules.md`.
 
 ## Estrutura
 
-Comece por:
+```text
+second-brain-agent/
+├── README.md
+├── .env.example
+├── .gitignore
+├── LICENSE
+├── brain/
+│   ├── INDEX.md                  # mapa do segundo cérebro (ponto de entrada)
+│   ├── 00-system/
+│   │   ├── README.md
+│   │   ├── agent-rules.md        # 20 regras operacionais
+│   │   ├── conventions.md        # nomes, datas, frontmatter, granularidade
+│   │   ├── taxonomy.md           # PARA adaptado
+│   │   └── runtime-contract.md   # o mínimo que um runtime deve fornecer
+│   ├── 10-inbox/                 # não classificado (destino em caso de dúvida)
+│   ├── 20-projects/              # objetivo definido, com conclusão possível
+│   ├── 30-areas/                 # responsabilidades contínuas
+│   ├── 40-resources/             # conhecimento reutilizável
+│   ├── 50-people/                # contexto sobre pessoas
+│   ├── 60-memory/                # profile, preferences, decisions, lessons
+│   ├── 70-skills/                # INDEX.md + contrato de Skills
+│   └── 90-archive/               # encerrado / inativo
+└── scripts/
+    ├── bootstrap.sh              # gera uma instância operacional do brain
+    └── validate_structure.py     # valida estrutura e ausência de secrets
+```
 
-- `brain/INDEX.md`
-- `brain/70-skills/INDEX.md`
+Um agente novo deve começar por `brain/INDEX.md` e `brain/70-skills/INDEX.md`.
+Esses dois arquivos bastam para entender a metodologia — sem varrer o filesystem.
 
-Esses arquivos permitem descoberta progressiva sem varrer todo o filesystem.
+## Skill vs Tool
 
-## Portabilidade
+- **Skill** — conhecimento operacional: *como* executar uma tarefa
+  (organizar o brain, cadastrar compromisso, adicionar backlog, consultar processo).
+- **Tool** — capacidade computacional: `read_file`, `write_file`, `append_file`,
+  `list_files`, `search_text`, `http_request`.
 
-A mesma base pode ser consumida por:
+Skills citam Tools por **nome conceitual**. O mapeamento para a implementação real
+é responsabilidade do runtime. Ver `brain/70-skills/README.md`.
 
-- Nanobot
-- DeepSeek Harness
-- outro runtime compatível
-- aplicação própria
-
-## Endpoints e secrets
-
-Skills podem referenciar endpoints conceitualmente, por exemplo:
-
-- `{{N8N_URL}}`
-- `{{KESTRA_URL}}`
-
-Valores reais devem vir do ambiente/runtime (`.env`, secret manager etc.). Nunca salve secrets em `brain/`.
-
-## Obsidian e Syncthing
-
-- `brain/` pode ser aberto como Vault do Obsidian.
-- A estrutura não depende de `.obsidian/` nem de plugins proprietários.
-- Em Syncthing, prefira arquivos menores para reduzir conflito.
-- Se humano e agente editarem o mesmo arquivo simultaneamente, podem ocorrer conflitos de sincronização.
-
-## Casos futuros (não implementados aqui)
-
-- Telegram → cadastrar agenda
-- Telegram → backlog
-- Telegram → disparar workflow n8n
-- Telegram → consultar projeto
-- Telegram → organizar memória
-- Telegram → consultar processo
-
-## Bootstrap
-
-Este repositório funciona como metodologia + template.
+## Como usar
 
 ```bash
 git clone <repo-url>
 cd second-brain-agent
+
+# gera uma instância operacional do brain, fora deste repositório
 ./scripts/bootstrap.sh /caminho/do/brain
-```
 
-## Validar estrutura
-
-```bash
-python3 scripts/validate_structure.py
+# valida
 python3 scripts/validate_structure.py --brain /caminho/do/brain
 ```
+
+`bootstrap.sh` nunca sobrescreve arquivos existentes: o que já estiver no destino
+é preservado e reportado como `skip`. Use `--dry-run` para simular.
+
+## Endpoints e secrets
+
+Skills referenciam endpoints e credenciais apenas por nome conceitual:
+
+```text
+{{N8N_URL}}
+{{KESTRA_URL}}
+```
+
+Os valores reais vêm do runtime ou do ambiente (`.env`, secret manager). Copie
+`.env.example` para `.env` — que é ignorado pelo Git. **Nenhum secret pode entrar
+em `brain/`**; `validate_structure.py` procura por padrões evidentes de credencial.
+
+## Obsidian
+
+`brain/` pode ser aberto diretamente como Vault, mas não depende disso:
+
+- Markdown puro; nada crítico depende de plugin.
+- Links relativos; Wikilinks só quando não quebrarem a portabilidade.
+- Plugins podem melhorar visualização, nunca definir a estrutura dos dados.
+- `.obsidian/` não é necessário para interpretar o conteúdo e está no `.gitignore`.
+
+## Syncthing
+
+`brain/` foi pensado para sincronizar entre VPS e computador pessoal. Por isso:
+
+- prefira arquivos menores a arquivos monolíticos;
+- prefira criar notas novas e fazer append controlado a reescrever;
+- divida por projeto, assunto ou data quando fizer sentido.
+
+**Risco conhecido:** se humano e agente editarem o mesmo arquivo ao mesmo tempo em
+máquinas diferentes, o Syncthing gera arquivos `*.sync-conflict-*` e uma das
+versões precisa ser reconciliada à mão. Granularidade fina reduz a superfície do
+problema; não a elimina. Evite deixar o agente reescrevendo arquivos grandes
+enquanto você edita o mesmo vault.
+
+## Portabilidade
+
+A mesma base pode ser consumida por Nanobot, DeepSeek Harness, outro runtime
+compatível ou uma aplicação própria. Para isso, o runtime só precisa cumprir
+`brain/00-system/runtime-contract.md`: expor as tools conceituais, resolver as
+variáveis `{{...}}` e respeitar `NO SKILL → NO ACTION`.
+
+**Teste de sucesso:** apague o runtime por completo. Todo o conteúdo de `brain/`
+continua legível, editável e reutilizável com um editor de texto qualquer.
+
+## Casos futuros (não implementados)
+
+```text
+Telegram → cadastrar agenda
+Telegram → backlog
+Telegram → disparar workflow n8n
+Telegram → consultar projeto
+Telegram → organizar memória
+Telegram → consultar processo
+```
+
+## Fora de escopo, por decisão
+
+Banco de dados, vector database, embeddings, RAG, Redis, filas, Kubernetes,
+frameworks de agentes e dependências grandes. Filesystem + Markdown + dois scripts
+de biblioteca padrão são suficientes para inaugurar a metodologia.
+
+## Licença
+
+MIT — ver `LICENSE`.

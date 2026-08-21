@@ -1,25 +1,52 @@
-# Environment and secrets
+# --- Secrets e ambiente ---------------------------------------------------
 .env
 .env.*
+!.env.example
 *.key
 *.pem
 *.p12
 *.pfx
+*.crt
+*.jks
+*.keystore
+id_rsa
+id_ed25519
 secrets/
 credentials/
+.credentials/
+*_token
+*.token
+service-account*.json
 
-# Runtime/session artifacts
+# --- Artefatos de runtime (substituível, nunca fonte da verdade) ----------
 runtime/
 logs/
 sessions/
 cache/
+tmp/
+.state/
 
-# Python
+# --- Dados reais do usuário (este repo é template, não vault pessoal) -----
+# Descomente se você versionar seu brain operacional em OUTRO repositório.
+# brain-local/
+
+# --- Python ---------------------------------------------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
 
-# macOS/Linux noise
+# --- Editores / SO --------------------------------------------------------
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
 
-# Obsidian local settings
+# --- Obsidian: melhora visualização, não define a estrutura dos dados -----
 .obsidian/
+.trash/
+
+# --- Syncthing ------------------------------------------------------------
+.stfolder/
+.stversions/
+*.sync-conflict-*
