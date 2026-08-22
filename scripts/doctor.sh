@@ -147,6 +147,30 @@ else
   report "Nanobot" "WARN not installed" "esperado após install.sh"
 fi
 
+# --- controle de acesso -----------------------------------------------------
+# Fronteira determinística: o Nanobot rejeita quem não está na allowlist antes
+# de qualquer chamada ao LLM. Wildcard em canal pessoal é erro grave.
+NANOBOT_CFG="${NANOBOT_CONFIG:-$(assistant_home)/.nanobot/config.json}"
+CHECKER="${SCRIPT_DIR}/lib/check_access.py"
+if [[ ! -f "$CHECKER" ]] || ! command -v python3 >/dev/null 2>&1; then
+  report "Access control" "WARN não verificável" "check_access.py ou python3 ausente"
+elif [[ ! -f "$NANOBOT_CFG" ]]; then
+  report "Access control" "WARN config do Nanobot ausente" "$NANOBOT_CFG"
+else
+  access_out="$(python3 "$CHECKER" "$NANOBOT_CFG" 2>&1)" && access_rc=0 || access_rc=$?
+  while IFS=$'\t' read -r ch state detail; do
+    [[ -n "$ch" ]] || continue
+    label="$(printf '%s access' "$ch")"
+    case "$state" in
+      OK)       report "$label" "OK ${detail}" ;;
+      DISABLED) report "$label" "DISABLED" ;;
+      ERROR)    report "$label" "ERROR ${detail}" "feche a allowlist antes de expor o canal" ;;
+      *)        report "$label" "WARN ${detail}" ;;
+    esac
+  done <<< "$access_out"
+  [[ $access_rc -eq 2 ]] && details+=("  Access control: acesso aberto detectado")
+fi
+
 # --- configuração -----------------------------------------------------------
 # Só presença. Nunca valor.
 if [[ -f "$CONFIG_FILE" ]]; then

@@ -32,6 +32,21 @@ repositório é público e só versiona nomes de variáveis. Ver
 
 Idempotente: rodar de novo não duplica nada e não toca no brain existente.
 
+### Fechar o acesso ao owner
+
+O MVP é owner-only. Sem isso, o canal não sobe:
+
+```bash
+sudo sed -i '/^OWNER_TELEGRAM_ID=/d' /etc/professional-ai-assistant/assistant.env
+echo 'OWNER_TELEGRAM_ID=<user id numérico, sem @>' \
+  | sudo tee -a /etc/professional-ai-assistant/assistant.env >/dev/null
+sudo ./scripts/configure-nanobot.sh
+sudo ./scripts/doctor.sh
+```
+
+Sem o ID, o canal é **desabilitado** — nunca aberto. Ver
+[OPERATIONS](OPERATIONS.md#mvp-access-model).
+
 ## 2. Atualizar
 
 ```bash

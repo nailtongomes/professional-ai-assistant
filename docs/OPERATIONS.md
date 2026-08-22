@@ -55,6 +55,7 @@ Se essa rotina começar a crescer, o problema é o sistema, não o runbook.
 | `healthcheck.sh` | Nanobot, brain, permissões, n8n | não | n/a |
 | `bootstrap.sh` | cria um brain novo a partir do template | não | sim |
 | `doctor.sh` | diagnóstico somente leitura; não corrige nada | não | n/a |
+| `configure-nanobot.sh` | aplica a allowlist owner-only ao config do Nanobot | sim | sim |
 
 Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 
@@ -63,6 +64,126 @@ Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 `install`, `update` e `restore` usam `flock` em
 `/var/lock/professional-ai-assistant.lock`. Só um por vez. Sem `flock` no
 sistema, seguem com aviso.
+
+## MVP access model
+
+O MVP atende **somente o proprietário**. A fronteira é determinística e fica no
+canal, antes do agente:
+
+```text
+Owner
+  │ Telegram ID / WhatsApp ID / Email
+  ▼
+allowFrom nativo do Nanobot
+  │ sender fora da lista → descartado aqui
+  ▼
+Agent → brain / skills / tools
+```
+
+```text
+UNKNOWN ID = NO LLM
+NOT ALLOWED = NO AGENT
+```
+
+A rejeição acontece **antes do LLM**: desconhecido não consome token, não
+alcança o brain e não aparece em prompt nenhum.
+
+Dois pontos que decorrem disso:
+
+- **A identidade do owner é configuração operacional privada, não memória do
+  agente.** Ela vive no `assistant.env` da VPS e no `config.json` do Nanobot —
+  nunca em `brain/`, nunca numa Skill, nunca numa nota.
+- **O LLM não decide quem é o owner.** Editar `PHILOSOPHY.md`, `agent-rules.md`
+  ou qualquer prompt não concede acesso a ninguém: quando o texto é lido, a
+  autorização já aconteceu. É por isso que a allowlist é do canal e não uma
+  Skill.
+
+### Configurar
+
+```bash
+sudo sed -i '/^OWNER_TELEGRAM_ID=/d' /etc/professional-ai-assistant/assistant.env
+echo 'OWNER_TELEGRAM_ID=<seu user id numérico, sem @>' \
+  | sudo tee -a /etc/professional-ai-assistant/assistant.env >/dev/null
+sudo chmod 600 /etc/professional-ai-assistant/assistant.env
+
+sudo ./scripts/configure-nanobot.sh --dry-run
+sudo ./scripts/configure-nanobot.sh
+sudo ./scripts/doctor.sh
+```
+
+O script edita o `config.json` existente preservando o resto — token, provider,
+MCP, tudo que já estiver lá. Idempotente: rodar de novo não muda um byte.
+
+O User ID do Telegram é numérico e **sem o `@`**. WhatsApp usa o sender ID
+(telefone sem `+`) ou JID; Email usa o endereço.
+
+### Fail closed
+
+Variável do owner ausente **não** abre o canal:
+
+| Situação | Resultado |
+| -------- | --------- |
+| `OWNER_TELEGRAM_ID` definido | `enabled: true`, `allowFrom: ["<id>"]` |
+| `OWNER_TELEGRAM_ID` ausente ou vazio | `enabled: false`, `allowFrom: []`, exit 3 |
+| `allowFrom: ["*"]` encontrado | substituído pelo owner; recusado se persistir |
+
+Remover a variável por acidente **fecha** o acesso. Nunca o abre.
+
+Por que desabilitar o canal em vez de confiar em `allowFrom: []`: a documentação
+atual do Nanobot descreve `["*"]` (todos) e a omissão do campo (modo pairing),
+mas **não** documenta explicitamente a semântica da lista vazia. Como o
+comportamento não é garantido, o script não o usa como bloqueio — desabilita o
+canal e deixa a lista vazia apenas como reforço.
+
+### Pairing
+
+O Nanobot suporta pairing quando `allowFrom` é omitido: o primeiro DM recebe um
+código, aprovado com `/pairing approve <code>`.
+
+Para este MVP, **preferimos allowlist estática**. Pairing é um fluxo interativo
+com janela de aprovação; a allowlist é determinística e não tem janela. Pairing
+segue disponível como opção futura, mas não substitui o owner allowlist agora.
+
+### Wildcard
+
+`allowFrom: ["*"]` bypassa o pairing e libera qualquer um que alcance o canal. Em
+canal pessoal isso é **erro grave**: o `doctor` sai com código 2 e o
+`configure-nanobot.sh` se recusa a gravar um config que o contenha.
+
+Nenhum arquivo versionado deste repositório contém `["*"]`, e a suíte de testes
+falha se alguém introduzir um.
+
+### Future external-user access
+
+Ainda **não implementado**, e deliberadamente fora desta fase:
+
+```text
+unknown user
+  ▼
+deterministic gate        (allowFrom continua sendo a primeira muralha)
+  ▼
+authorization service
+  ▼
+n8n / customer lookup
+  ▼
+allowed public skills
+  ▼
+metering / billing
+```
+
+Quando existir, a regra que já fica registrada: **usuário externo nunca recebe o
+mesmo conjunto de tools e contexto do owner.**
+
+| | OWNER | EXTERNAL USER |
+| - | ----- | ------------- |
+| brain pessoal | sim | não |
+| memória, agenda, projetos | sim | não |
+| Skills privadas | sim | não |
+| Skills públicas | sim | apenas as autorizadas |
+| tools administrativas | sim | não |
+
+Nada disso entra sem dor real e documentada — `docs/ENGINEERING-PRINCIPLES.md`.
+Sem banco de usuários, sem créditos, sem billing, sem ACL dinâmica agora.
 
 ## Diagnóstico
 
@@ -81,6 +202,17 @@ scripts presentes e executáveis, Nanobot e versão, `assistant.env` e permissã
 health da automação, idade do último backup, e `validate_structure.py`.
 
 Antes do deploy, Nanobot ausente é **aviso**, não erro.
+
+Também reporta o controle de acesso por canal, sem imprimir o identificador
+inteiro:
+
+```text
+telegram access    OK owner-only (...4821)
+whatsapp access    DISABLED
+email access       DISABLED
+```
+
+`ERROR allowFrom wildcard: acesso aberto` faz o `doctor` sair com código 2.
 
 ## Arquivos gerenciados vs. dados do usuário
 
