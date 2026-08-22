@@ -1,6 +1,8 @@
 ---
 type: skill
 name: backlog
+description: >
+  Registra rapidamente itens para lembrar, avaliar, pesquisar ou fazer depois.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

@@ -65,6 +65,22 @@ Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 `/var/lock/professional-ai-assistant.lock`. Só um por vez. Sem `flock` no
 sistema, seguem com aviso.
 
+## Runtime ativo
+
+```env
+ASSISTANT_RUNTIME=nanobot   # padrão; alternativa: hermes
+```
+
+Escolha explícita, nunca detecção de binário. Valor inválido faz os scripts
+falharem em vez de adivinhar.
+
+`install.sh`, `update.sh` e `doctor.sh` delegam ao adapter do runtime ativo — e
+só a ele: nunca exigimos os dois instalados. Detalhes em
+`runtime-adapters/README.md`; a troca em `docs/RUNTIME-PORTABILITY.md`.
+
+Memória, sessões e Skills geradas pelo runtime são **auxiliares**. O canônico é
+`brain/`.
+
 ## MVP access model
 
 O MVP atende **somente o proprietário**. A fronteira é determinística e fica no

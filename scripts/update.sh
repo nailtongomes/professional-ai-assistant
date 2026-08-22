@@ -146,7 +146,19 @@ fi
 
 # --- runtime ----------------------------------------------------------------
 STAGE="atualizar runtime"
-if [[ "$SKIP_NANOBOT" == "1" ]]; then
+RUNTIME="$(selected_runtime)"
+log "runtime ativo: ${RUNTIME}"
+if [[ "$RUNTIME" == "hermes" ]]; then
+  # O Hermes tem mecanismo próprio de update. Só o runtime ativo é atualizado.
+  if is_dry_run; then
+    log "[dry-run] runuser -u ${ASSISTANT_USER} -- hermes update"
+  elif command -v hermes >/dev/null 2>&1; then
+    runuser -u "$ASSISTANT_USER" -- env HOME="$(assistant_home)" hermes update \
+      || die "hermes update falhou"
+  else
+    warn "hermes não instalado; rode install.sh"
+  fi
+elif [[ "$SKIP_NANOBOT" == "1" ]]; then
   log "atualização do Nanobot pulada (--skip-nanobot)"
 elif ! nanobot_bin >/dev/null 2>&1; then
   warn "Nanobot não instalado; rode install.sh"

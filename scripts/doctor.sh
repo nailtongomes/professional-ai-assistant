@@ -55,6 +55,9 @@ report() { # área, estado, detalhe
 
 load_env >/dev/null 2>&1 || true
 
+RUNTIME="$(selected_runtime)"
+report "Runtime" "OK ${RUNTIME}" "ASSISTANT_RUNTIME"
+
 # --- repositório ------------------------------------------------------------
 REPO_CHECKOUT="$REPO_DIR"
 [[ -d "${REPO_CHECKOUT}/.git" ]] || REPO_CHECKOUT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -138,9 +141,26 @@ else
   report "Scripts" "OK"
 fi
 
-# --- nanobot ----------------------------------------------------------------
+# --- runtime ativo ----------------------------------------------------------
+# Só o runtime selecionado é diagnosticado. Não exigimos os dois instalados.
+if [[ "$RUNTIME" != "nanobot" ]]; then
+  adapter_doctor="$(runtime_adapter_dir)/doctor.sh"
+  if [[ -x "$adapter_doctor" ]]; then
+    printf '\n'
+    "$adapter_doctor" || case $? in
+      2) errors=$((errors + 1)) ;;
+      *) warns=$((warns + 1)) ;;
+    esac
+    printf '\n'
+  else
+    report "Runtime adapter" "WARN doctor do adapter ${RUNTIME} não encontrado"
+  fi
+fi
+
 # Antes do deploy, ausência é aviso, não erro.
-if bin="$(nanobot_bin 2>/dev/null)"; then
+if [[ "$RUNTIME" != "nanobot" ]]; then
+  :
+elif bin="$(nanobot_bin 2>/dev/null)"; then
   version="$("$bin" --version 2>/dev/null | head -n1 || echo '?')"
   report "Nanobot" "OK ${version}" "$bin"
 else
@@ -152,7 +172,9 @@ fi
 # de qualquer chamada ao LLM. Wildcard em canal pessoal é erro grave.
 NANOBOT_CFG="${NANOBOT_CONFIG:-$(assistant_home)/.nanobot/config.json}"
 CHECKER="${SCRIPT_DIR}/lib/check_access.py"
-if [[ ! -f "$CHECKER" ]] || ! command -v python3 >/dev/null 2>&1; then
+if [[ "$RUNTIME" != "nanobot" ]]; then
+  : # o acesso do runtime alternativo é verificado pelo doctor do adapter
+elif [[ ! -f "$CHECKER" ]] || ! command -v python3 >/dev/null 2>&1; then
   report "Access control" "WARN não verificável" "check_access.py ou python3 ausente"
 elif [[ ! -f "$NANOBOT_CFG" ]]; then
   report "Access control" "WARN config do Nanobot ausente" "$NANOBOT_CFG"

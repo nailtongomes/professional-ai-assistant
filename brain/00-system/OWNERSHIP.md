@@ -64,6 +64,8 @@ Nenhum script de update escreve, move ou apaga aqui. É a garantia que sustenta
 ```text
 /etc/professional-ai-assistant/assistant.env   (inclui as identidades do owner)
 ~/.nanobot/config.json                          (allowlist efetiva do runtime)
+~/.hermes/                                      (SOUL.md derivado, skills mapeadas,
+                                                 memória e sessões nativas)
 /var/lib/professional-ai-assistant/runtime/
 /var/log/professional-ai-assistant/
 /var/backups/professional-ai-assistant/
@@ -75,6 +77,17 @@ overrides locais, sessões, cache
 | você, como administrador | à mão, na máquina |
 | os scripts | dentro do que cada um declara |
 | Git | **nunca** — não é versionado |
+
+Memória, sessões e Skills que um runtime cria por conta própria são
+`local-managed` — **auxiliares, nunca fonte da verdade**. Elas não são
+sincronizadas para `brain/60-memory/` nem para `brain/70-skills/`, e só viram
+canônicas por revisão humana explícita. Sem merge automático, sem promoção
+automática.
+
+Arquivos derivados (por exemplo `~/.hermes/SOUL.md`, gerado de
+`PHILOSOPHY.md`) são descartáveis por construção: apagar e regenerar não perde
+nada. Se um derivado passar a conter informação que não existe na fonte, a
+fonte está errada.
 
 O `config.json` do Nanobot é `local-managed`: o repositório versiona o **script
 que o gera** (`scripts/configure-nanobot.sh`) e o `.env.example` com as

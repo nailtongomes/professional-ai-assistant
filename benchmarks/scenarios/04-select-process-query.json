@@ -1,0 +1,13 @@
+{
+  "scenario": "04-select-process-query",
+  "input": "Consulta o processo 0801234-12.2025.8.20.5001.",
+  "expected_skill": "process-query",
+  "expected_action": "http",
+  "expected_target": "workflow consultar-processo",
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}

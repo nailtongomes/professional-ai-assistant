@@ -1,6 +1,8 @@
 ---
 type: skill
 name: process-query
+description: >
+  Roteia consultas rápidas e cópias integrais de processos judiciais para automações externas.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

@@ -1,6 +1,8 @@
 ---
 type: skill
 name: person-search
+description: >
+  Roteia consultas por CPF, CNPJ ou OAB para automações externas.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

@@ -1,0 +1,13 @@
+{
+  "scenario": "08-detect-agenda-conflict",
+  "input": "Marca reunião amanhã às 14h. (já existe evento às 14h)",
+  "expected_skill": "agenda",
+  "expected_action": "ask",
+  "expected_target": null,
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}

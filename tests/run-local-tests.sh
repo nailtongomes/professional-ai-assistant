@@ -260,7 +260,116 @@ echo 'OWNER_TELEGRAM_ID=123456789' >> "$CFG_ENV"
 python3 "$REPO/tests/assert_config.py" "$NB_CFG" only-owner \
   && ok "caso 4: segundo sender fora da allowlist" || bad "caso 4 falhou"
 
+printf '\n== seleção de runtime ==\n'
+HERMES_DIR="$TMP/hermes-home"; mkdir -p "$HERMES_DIR"
+CFG_ENV="$CONFIG_DIR/assistant.env"
+
+check "runtime padrão é nanobot" bash -c '
+  . "$0/scripts/lib/common.sh"; [ "$(selected_runtime)" = "nanobot" ]' "$REPO"
+check "ASSISTANT_RUNTIME=hermes seleciona hermes" bash -c '
+  export ASSISTANT_RUNTIME=hermes; . "$0/scripts/lib/common.sh"
+  [ "$(selected_runtime)" = "hermes" ]' "$REPO"
+check_fails "runtime inválido falha" bash -c '
+  export ASSISTANT_RUNTIME=invalido; . "$0/scripts/lib/common.sh"; selected_runtime' "$REPO"
+check "state é separado por runtime" bash -c '
+  . "$0/scripts/lib/common.sh"
+  n="$(ASSISTANT_RUNTIME=nanobot; selected_runtime)"
+  h="$(ASSISTANT_RUNTIME=hermes; selected_runtime)"
+  [ "$n" != "$h" ]' "$REPO"
+
+# doctor diagnostica o runtime ativo, sem exigir o outro instalado
+if "$REPO/scripts/doctor.sh" --skip-network >"$TMP/rt.out" 2>&1; then :; fi
+grep -q "^Runtime  *OK nanobot" "$TMP/rt.out" && ok "doctor mostra o runtime ativo" \
+                                              || bad "doctor não mostrou o runtime"
+# A configuração vence o ambiente: para trocar de runtime, muda-se o env file.
+sed -i 's/^ASSISTANT_RUNTIME=.*/ASSISTANT_RUNTIME=hermes/' "$CFG_ENV"
+grep -q '^ASSISTANT_RUNTIME=' "$CFG_ENV" || echo 'ASSISTANT_RUNTIME=hermes' >> "$CFG_ENV"
+if "$REPO/scripts/doctor.sh" --skip-network >"$TMP/rt2.out" 2>&1; then :; fi
+sed -i 's/^ASSISTANT_RUNTIME=.*/ASSISTANT_RUNTIME=nanobot/' "$CFG_ENV"
+grep -q "hermes" "$TMP/rt2.out" && ok "doctor delega ao adapter hermes" || bad "sem delegação"
+grep -q "Nanobot.*not installed" "$TMP/rt2.out" && bad "doctor exigiu nanobot com runtime hermes" \
+                                                 || ok "doctor não exige o runtime inativo"
+
+printf '\n== adapter hermes ==\n'
+cat > "$TMP/hermes.env" <<'ENVEOF'
+ASSISTANT_RUNTIME=hermes
+OWNER_TELEGRAM_ID=123456789
+ENVEOF
+HCFG=(--brain "$BRAIN" --hermes-home "$HERMES_DIR" --env-file "$TMP/hermes.env")
+
+# exit 3 = canais sem owner desabilitados (esperado: só telegram tem owner aqui).
+run_configure() {
+  if python3 "$REPO/runtime-adapters/hermes/configure.py" "$@" >"$TMP/cfg.out" 2>&1
+  then echo 0; else echo $?; fi
+}
+rc="$(run_configure --dry-run "${HCFG[@]}")"
+[[ "$rc" == "0" || "$rc" == "3" ]] && ok "configure --dry-run (exit $rc)" || bad "configure --dry-run: exit $rc"
+[[ -e "$HERMES_DIR/SOUL.md" ]] && bad "dry-run gravou arquivos" || ok "dry-run não gravou nada"
+
+rc="$(run_configure "${HCFG[@]}")"
+[[ "$rc" == "0" || "$rc" == "3" ]] && ok "configure aplica (exit $rc)" || bad "configure aplica: exit $rc"
+[[ -f "$HERMES_DIR/SOUL.md" ]] && ok "SOUL.md derivado gerado" || bad "SOUL.md ausente"
+grep -q "GERADO" "$HERMES_DIR/SOUL.md" && ok "SOUL.md marcado como derivado" || bad "SOUL.md sem marca"
+skills_linked="$(find "$HERMES_DIR/skills" -maxdepth 1 -type l -name 'pai-*' | wc -l)"
+[[ "$skills_linked" -eq 8 ]] && ok "8 Skills mapeadas por symlink" || bad "mapeou $skills_linked Skills"
+
+# Skills canônicas não mudam ao configurar o runtime
+canon_before="$(find "$BRAIN/70-skills" -name SKILL.md -exec sha256sum {} + | sha256sum)"
+run_configure "${HCFG[@]}" >/dev/null
+canon_after="$(find "$BRAIN/70-skills" -name SKILL.md -exec sha256sum {} + | sha256sum)"
+[[ "$canon_before" == "$canon_after" ]] && ok "Skills canônicas intactas" || bad "Skills canônicas mudaram"
+
+# dados user-owned intactos ao trocar de runtime
+[[ -f "$BRAIN/10-inbox/minha-nota.md" ]] && ok "user data preservado na troca de runtime" \
+                                         || bad "user data perdido"
+
+# idempotência
+run_configure "${HCFG[@]}" >/dev/null
+grep -q "convergido" "$TMP/cfg.out" && ok "configure é idempotente" || bad "configure não convergiu"
+
+# owner-only e fail closed
+grep -q "dm_policy: allowlist" "$HERMES_DIR/gateway.yaml" && ok "dm_policy allowlist explícito" \
+                                                          || bad "dm_policy ausente"
+grep -qE 'allow_from: \["123456789"\]' "$HERMES_DIR/gateway.yaml" && ok "allow_from = owner" \
+                                                                  || bad "allow_from incorreto"
+grep -q "dm_policy: open" "$HERMES_DIR/gateway.yaml" && bad "dm_policy open encontrado" \
+                                                     || ok "nenhum dm_policy open"
+echo 'ASSISTANT_RUNTIME=hermes' > "$TMP/hermes-noowner.env"
+hrc="$(run_configure --brain "$BRAIN" --hermes-home "$HERMES_DIR" \
+        --env-file "$TMP/hermes-noowner.env")"
+[[ $hrc -eq 3 ]] && ok "fail closed sem owner (exit 3)" || bad "fail closed: exit $hrc"
+grep -A3 "^telegram:" "$HERMES_DIR/gateway.yaml" | grep -q "enabled: false" \
+  && ok "canal desabilitado sem owner" || bad "canal ficou habilitado"
+
+# Skill gerada pelo runtime não toca as managed
+mkdir -p "$HERMES_DIR/skills/auto-gerada"
+echo "# gerada pelo runtime" > "$HERMES_DIR/skills/auto-gerada/SKILL.md"
+run_configure --brain "$BRAIN" --hermes-home "$HERMES_DIR" --env-file "$TMP/hermes.env" >/dev/null
+[[ -f "$HERMES_DIR/skills/auto-gerada/SKILL.md" ]] && ok "Skill do runtime preservada onde nasceu" \
+                                                   || bad "Skill do runtime removida"
+find "$BRAIN/70-skills" -name "SKILL.md" -newer "$HERMES_DIR/skills/auto-gerada/SKILL.md" 2>/dev/null | grep -q . \
+  && bad "Skill gerada alterou o brain" || ok "Skill gerada não alterou managed skills"
+
+# Acoplamento real seria citar o runtime onde a Skill declara capacidades.
+# Menção em exemplo de fala do usuário ("decidi usar X no MVP") é conteúdo, não
+# acoplamento — por isso a checagem olha a seção Tools, não o arquivo inteiro.
+check "Skills declaram capacidades conceituais" python3 - "$REPO" <<'PYEOF'
+import re, sys
+from pathlib import Path
+bad = []
+for skill in Path(sys.argv[1], "brain/70-skills").rglob("SKILL.md"):
+    text = skill.read_text(encoding="utf-8")
+    m = re.search(r"^## Tools$(.*?)^## ", text, re.M | re.S)
+    if not m:
+        bad.append(f"{skill}: sem seção Tools")
+        continue
+    if re.search(r"(?i)hermes|nanobot", m.group(1)):
+        bad.append(f"{skill}: cita runtime na seção Tools")
+sys.exit(1 if bad else 0)
+PYEOF
+
 printf '\n== casos conceituais ==\n'
+
 check "validate_cases"                  python3 "$REPO/tests/validate_cases.py"
 check "validate_cases --strict"         python3 "$REPO/tests/validate_cases.py" --strict
 

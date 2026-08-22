@@ -47,6 +47,9 @@ INDEX.md
 60-memory/decisions.example.md
 60-memory/lessons.example.md
 
+# Nota: runtime-adapters/, benchmarks/ e docs/ vivem no repositório (não no
+# brain) e são managed por definição — o manifesto cobre só paths do brain.
+
 # --- Skills oficiais: jurídicas e de comunicação ---
 70-skills/legal/process-query/
 70-skills/legal/person-search/

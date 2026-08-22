@@ -1,6 +1,8 @@
 ---
 type: skill
 name: invoke-workflow
+description: >
+  Executa workflows externos previamente registrados usando contratos HTTP declarados.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

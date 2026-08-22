@@ -1,6 +1,8 @@
 ---
 type: skill
 name: send-email
+description: >
+  Roteia envio de e-mails por workflow externo.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

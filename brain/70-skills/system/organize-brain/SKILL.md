@@ -1,6 +1,8 @@
 ---
 type: skill
 name: organize-brain
+description: >
+  Classifica e armazena novas informações no segundo cérebro usando a taxonomia definida pelo sistema.
 status: active
 created: 2026-08-21
 updated: 2026-08-21
