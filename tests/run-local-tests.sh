@@ -195,6 +195,71 @@ check "doctor é somente leitura"        bash -c '
 check_fails "doctor falha sem brain" \
   env ASSISTANT_PREFIX="$TMP/vazio" "$REPO/scripts/doctor.sh" --skip-network
 
+printf '\n== acesso owner-only ==\n'
+NB_CFG="$ASSISTANT_HOME/.nanobot/config.json"
+mkdir -p "$(dirname "$NB_CFG")"
+CFG_ENV="$CONFIG_DIR/assistant.env"
+
+# Caso 6 (preservação) + caso 1 (owner definido): config com outras opções.
+cat > "$NB_CFG" <<'JSON'
+{"providers":{"groq":{"apiKey":"${GROQ_KEY}"}},
+ "channels":{"telegram":{"enabled":true,"token":"${TELEGRAM_TOKEN}","allowFrom":["*"]},
+             "slack":{"enabled":false}},
+ "outraOpcao":true}
+JSON
+sed -i '/^OWNER_TELEGRAM_ID=/d' "$CFG_ENV"
+echo 'OWNER_TELEGRAM_ID=123456789' >> "$CFG_ENV"
+
+check "configure --dry-run"             "$REPO/scripts/configure-nanobot.sh" --dry-run
+grep -q '"\*"' "$NB_CFG" && ok "dry-run não alterou o config" || bad "dry-run alterou o config"
+
+check "configure aplica owner-only"     "$REPO/scripts/configure-nanobot.sh"
+if python3 "$REPO/tests/assert_config.py" "$NB_CFG" owner-applied; then
+  ok "caso 1: allowFrom = [owner], enabled = true"
+else bad "caso 1 falhou"; fi
+if python3 "$REPO/tests/assert_config.py" "$NB_CFG" preserved; then
+  ok "caso 6: opções não relacionadas preservadas"
+else bad "caso 6 falhou"; fi
+
+before="$(sha256sum "$NB_CFG" | cut -d' ' -f1)"
+"$REPO/scripts/configure-nanobot.sh" >/dev/null 2>&1
+after="$(sha256sum "$NB_CFG" | cut -d' ' -f1)"
+[[ "$before" == "$after" ]] && ok "caso 5: idempotente (config byte a byte igual)" \
+                            || bad "caso 5: config mudou na 2a execução"
+
+# Caso 3: wildcard é erro grave no doctor.
+python3 "$REPO/tests/assert_config.py" "$NB_CFG" set-wildcard
+if "$REPO/scripts/doctor.sh" --skip-network >"$TMP/acc.out" 2>&1; then acc_rc=0; else acc_rc=$?; fi
+[[ $acc_rc -eq 2 ]] && ok "caso 3: doctor sai 2 com wildcard" || bad "caso 3: doctor saiu $acc_rc"
+grep -q "telegram access.*ERROR" "$TMP/acc.out" && ok "caso 3: doctor aponta o canal" \
+                                                || bad "caso 3: canal não apontado"
+grep -q "123456789" "$TMP/acc.out" && bad "doctor imprimiu o ID completo" \
+                                   || ok "doctor mascara o identificador"
+
+check "configure fecha wildcard"        "$REPO/scripts/configure-nanobot.sh"
+python3 "$REPO/tests/assert_config.py" "$NB_CFG" owner-applied \
+  && ok "wildcard substituído pelo owner" || bad "wildcard permaneceu"
+
+# Caso 2: owner ausente = fail closed, nunca wildcard.
+sed -i '/^OWNER_TELEGRAM_ID=/d' "$CFG_ENV"
+if "$REPO/scripts/configure-nanobot.sh" >/dev/null 2>&1; then cfg_rc=0; else cfg_rc=$?; fi
+[[ $cfg_rc -eq 3 ]] && ok "caso 2: fail closed sinalizado (exit 3)" || bad "caso 2: exit $cfg_rc"
+python3 "$REPO/tests/assert_config.py" "$NB_CFG" fail-closed \
+  && ok "caso 2: canal desabilitado, allowFrom vazio, sem wildcard" \
+  || bad "caso 2: canal não fechou"
+
+# Config corrompido nunca é sobrescrito.
+cp "$NB_CFG" "$TMP/cfg.bak"; echo '{quebrado' > "$NB_CFG"
+check_fails "configure recusa JSON inválido"  "$REPO/scripts/configure-nanobot.sh"
+grep -q "quebrado" "$NB_CFG" && ok "config inválido preservado" || bad "config inválido foi sobrescrito"
+cp "$TMP/cfg.bak" "$NB_CFG"
+
+# Caso 4: sender desconhecido não está na allowlist (rejeição é nativa do Nanobot).
+echo 'OWNER_TELEGRAM_ID=123456789' >> "$CFG_ENV"
+"$REPO/scripts/configure-nanobot.sh" >/dev/null 2>&1
+python3 "$REPO/tests/assert_config.py" "$NB_CFG" only-owner \
+  && ok "caso 4: segundo sender fora da allowlist" || bad "caso 4 falhou"
+
 printf '\n== casos conceituais ==\n'
 check "validate_cases"                  python3 "$REPO/tests/validate_cases.py"
 check "validate_cases --strict"         python3 "$REPO/tests/validate_cases.py" --strict

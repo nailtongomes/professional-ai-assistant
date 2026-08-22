@@ -83,7 +83,17 @@ sudo -u assistant -H nanobot gateway status
 
 ### 9. Canais (depois)
 
-Telegram e afins só depois que o assistente estiver saudável localmente.
+Telegram e afins só depois que o assistente estiver saudável localmente — e
+sempre com a allowlist do owner aplicada antes de o canal subir:
+
+```bash
+sudo ./scripts/configure-nanobot.sh --dry-run
+sudo ./scripts/configure-nanobot.sh
+```
+
+O MVP é owner-only por construção: sem `OWNER_TELEGRAM_ID`, o canal é
+desabilitado em vez de aberto. Ver
+[OPERATIONS](OPERATIONS.md#mvp-access-model).
 
 ### 10. Exposição web (por último)
 

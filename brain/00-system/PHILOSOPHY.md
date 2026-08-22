@@ -70,6 +70,12 @@ Ler o brain inteiro não é diligência, é desperdício.
 **O harness é descartável.** Runtime é infraestrutura, não patrimônio. Nada de
 valor pode existir somente dentro dele.
 
+**O assistente pessoal começa fechado.** Somente identidades explicitamente
+configuradas alcançam o agente: `UNKNOWN ID = NO LLM`, `NOT ALLOWED = NO AGENT`.
+Essa fronteira é do canal e do runtime, não do modelo — alterar este arquivo, ou
+qualquer prompt, não concede acesso a ninguém. Abrir o acesso é decisão
+deliberada de configuração, nunca efeito colateral.
+
 **Os dados pertencem ao usuário.** Markdown é a fonte da verdade, legível sem
 agente, sem plugin e sem servidor. O assistente é visita nos arquivos dele.
 

@@ -62,7 +62,8 @@ Nenhum script de update escreve, move ou apaga aqui. É a garantia que sustenta
 ## local-managed — técnico e local da instância
 
 ```text
-/etc/professional-ai-assistant/assistant.env
+/etc/professional-ai-assistant/assistant.env   (inclui as identidades do owner)
+~/.nanobot/config.json                          (allowlist efetiva do runtime)
 /var/lib/professional-ai-assistant/runtime/
 /var/log/professional-ai-assistant/
 /var/backups/professional-ai-assistant/
@@ -74,6 +75,11 @@ overrides locais, sessões, cache
 | você, como administrador | à mão, na máquina |
 | os scripts | dentro do que cada um declara |
 | Git | **nunca** — não é versionado |
+
+O `config.json` do Nanobot é `local-managed`: o repositório versiona o **script
+que o gera** (`scripts/configure-nanobot.sh`) e o `.env.example` com as
+variáveis, nunca o arquivo resultante nem os identificadores. Ele também não
+deve ser sincronizado por Syncthing — é configuração de uma máquina, não dado.
 
 **Nunca assuma que isto se replica pelo Git.** Ao montar uma instância nova,
 `local-managed` é recriado do zero ou restaurado de backup. Os secrets nunca

@@ -81,7 +81,31 @@ else
   bad "brain não encontrado: ${BRAIN_DIR}"
 fi
 
-# --- 3. n8n ----------------------------------------------------------------
+# --- 3. Controle de acesso --------------------------------------------------
+# Nenhuma mensagem é enviada: só leitura do config.
+[[ "$QUIET" == "1" ]] || printf '\nAcesso\n'
+nb_config="${NANOBOT_CONFIG:-$(assistant_home)/.nanobot/config.json}"
+checker="${SCRIPT_DIR}/lib/check_access.py"
+if [[ ! -f "$nb_config" ]]; then
+  soft "config do Nanobot ausente: ${nb_config}"
+elif [[ ! -f "$checker" ]] || ! command -v python3 >/dev/null 2>&1; then
+  soft "verificação de acesso indisponível"
+else
+  access_rc=0
+  access_out="$(python3 "$checker" "$nb_config" 2>&1)" || access_rc=$?
+  while IFS=$'\t' read -r ch state detail; do
+    [[ -n "$ch" ]] || continue
+    case "$state" in
+      OK)       ok "${ch}: ${detail}" ;;
+      DISABLED) ok "${ch}: desabilitado" ;;
+      ERROR)    bad "${ch}: ${detail}" ;;
+      *)        soft "${ch}: ${detail}" ;;
+    esac
+  done <<< "$access_out"
+  [[ $access_rc -eq 2 ]] && bad "acesso aberto detectado; corrija antes de operar"
+fi
+
+# --- 4. n8n ----------------------------------------------------------------
 [[ "$QUIET" == "1" ]] || printf '\nn8n\n'
 if [[ -z "${N8N_BASE_URL:-}" ]]; then
   soft "N8N_BASE_URL não configurado; verificação pulada"
@@ -110,7 +134,7 @@ else
   fi
 fi
 
-# --- 4. Diretórios operacionais -------------------------------------------
+# --- 5. Diretórios operacionais -------------------------------------------
 [[ "$QUIET" == "1" ]] || printf '\nDiretórios\n'
 for d in "$RUNTIME_DIR" "$BACKUP_DIR" "$CONFIG_DIR"; do
   [[ -d "$d" ]] && ok "$d" || soft "ausente: $d"
