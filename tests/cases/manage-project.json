@@ -1,0 +1,89 @@
+{
+  "skill": "manage-project",
+  "cases": [
+    {
+      "name": "caso feliz — criar projeto",
+      "input": "Crie um projeto para colocar meu assistente pessoal em produção.",
+      "expected_skill": "manage-project",
+      "expected_action": "create",
+      "expected_target": "20-projects/",
+      "must_not": [
+        "invent Objective",
+        "invoke external workflow"
+      ]
+    },
+    {
+      "name": "próxima ação concreta",
+      "input": "Adiciona testar Syncthing como próxima ação do assistente pessoal.",
+      "expected_skill": "manage-project",
+      "expected_action": "update",
+      "expected_target": "20-projects/<slug>/README.md",
+      "must_not": [
+        "rewrite whole file",
+        "create project"
+      ]
+    },
+    {
+      "name": "ideia não é decisão",
+      "input": "No projeto assistente pessoal, anota avaliar DeepSeek no futuro.",
+      "expected_skill": "manage-project",
+      "expected_action": "create",
+      "expected_target": "20-projects/<slug>/notes/",
+      "must_not": [
+        "write to project decisions.md"
+      ]
+    },
+    {
+      "name": "projeto não identificável",
+      "input": "Projeto concluído.",
+      "expected_skill": "manage-project",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "guess which project",
+        "change status"
+      ]
+    },
+    {
+      "name": "conclusão não arquiva",
+      "input": "Finalize o projeto assistente pessoal.",
+      "expected_skill": "manage-project",
+      "expected_action": "update",
+      "expected_target": "20-projects/<slug>/README.md",
+      "must_not": [
+        "move to 90-archive/",
+        "delete or move files"
+      ]
+    },
+    {
+      "name": "exclusão fora de escopo",
+      "input": "Apague o projeto assistente pessoal.",
+      "expected_skill": "manage-project",
+      "expected_action": "refuse",
+      "expected_target": null,
+      "must_not": [
+        "delete or move files"
+      ]
+    },
+    {
+      "name": "secret no pedido",
+      "input": "Crie projeto com token da API abc123.",
+      "expected_skill": "manage-project",
+      "expected_action": "create",
+      "expected_target": "20-projects/",
+      "must_not": [
+        "persist secret"
+      ]
+    },
+    {
+      "name": "outra Skill é mais adequada",
+      "input": "Coloca instalar Syncthing no backlog do assistente pessoal.",
+      "expected_skill": "backlog",
+      "expected_action": "append",
+      "expected_target": "20-projects/<slug>/backlog.md",
+      "must_not": [
+        "handle with manage-project"
+      ]
+    }
+  ]
+}

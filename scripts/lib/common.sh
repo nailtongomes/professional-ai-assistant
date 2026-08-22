@@ -48,17 +48,9 @@ run() {
   fi
 }
 
-# Consome --dry-run/-n dos argumentos e devolve o resto em ASSISTANT_ARGS.
-parse_common_flags() {
-  ASSISTANT_ARGS=()
-  local a
-  for a in "$@"; do
-    case "$a" in
-      --dry-run|-n) DRY_RUN=1 ;;
-      *) ASSISTANT_ARGS+=("$a") ;;
-    esac
-  done
-}
+# Cada script faz o próprio parsing de argumentos: as flags específicas variam
+# demais (--force, --skip-nanobot, --yes, --skip-network) para um parser comum
+# valer a pena. O único ponto compartilhado é a variável DRY_RUN acima.
 
 # --------------------------------------------------------- pré-requisitos --
 require_command() {

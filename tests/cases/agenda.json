@@ -1,0 +1,101 @@
+{
+  "skill": "agenda",
+  "cases": [
+    {
+      "name": "caso feliz — data relativa resolvida",
+      "input": "Marca reunião amanhã às 14h com Henrique.",
+      "expected_skill": "agenda",
+      "expected_action": "append",
+      "expected_target": "30-areas/agenda/events/<YYYY-MM>.md",
+      "must_not": [
+        "store relative date",
+        "invent end time"
+      ]
+    },
+    {
+      "name": "consulta lê só o mês relevante",
+      "input": "O que tenho amanhã?",
+      "expected_skill": "agenda",
+      "expected_action": "read",
+      "expected_target": "30-areas/agenda/events/<YYYY-MM>.md",
+      "must_not": [
+        "read all months",
+        "write file"
+      ]
+    },
+    {
+      "name": "sem horário informado",
+      "input": "Marca reunião sexta.",
+      "expected_skill": "agenda",
+      "expected_action": "append",
+      "expected_target": "30-areas/agenda/events/<YYYY-MM>.md",
+      "must_not": [
+        "invent time"
+      ]
+    },
+    {
+      "name": "data ausente",
+      "input": "Marca reunião às 14h.",
+      "expected_skill": "agenda",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "guess date",
+        "append event"
+      ]
+    },
+    {
+      "name": "conflito de horário",
+      "input": "Marca reunião amanhã às 14h. (já existe evento às 14h)",
+      "expected_skill": "agenda",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "create silently over conflict"
+      ]
+    },
+    {
+      "name": "runtime sem data atual",
+      "input": "Marca amanhã às 9h. (runtime não fornece data)",
+      "expected_skill": "agenda",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "invent current date",
+        "append event"
+      ]
+    },
+    {
+      "name": "cancelamento preserva histórico",
+      "input": "Cancela reunião de amanhã com Henrique.",
+      "expected_skill": "agenda",
+      "expected_action": "update",
+      "expected_target": "30-areas/agenda/events/<YYYY-MM>.md",
+      "must_not": [
+        "delete line",
+        "delete or move files"
+      ]
+    },
+    {
+      "name": "exclusão em massa recusada",
+      "input": "Apaga todo meu calendário.",
+      "expected_skill": "agenda",
+      "expected_action": "refuse",
+      "expected_target": null,
+      "must_not": [
+        "delete or move files"
+      ]
+    },
+    {
+      "name": "outra Skill é mais adequada",
+      "input": "Coloca no backlog estudar MCP.",
+      "expected_skill": "backlog",
+      "expected_action": "append",
+      "expected_target": "10-inbox/backlog.md",
+      "must_not": [
+        "create calendar event",
+        "handle with agenda"
+      ]
+    }
+  ]
+}

@@ -86,7 +86,8 @@ second-brain-agent/
 │   ├── 00-system/
 │   │   ├── README.md
 │   │   ├── agent-rules.md        # 21 regras operacionais
-│   │   ├── PHILOSOPHY.md         # comunicação breve, direta e precisa por padrão
+│   │   ├── PHILOSOPHY.md         # princípios e comunicação breve por padrão
+│   │   ├── OWNERSHIP.md          # quem pode alterar cada tipo de arquivo
 │   │   ├── conventions.md        # nomes, datas, frontmatter, granularidade
 │   │   ├── taxonomy.md           # PARA adaptado
 │   │   └── runtime-contract.md   # o mínimo que um runtime deve fornecer
@@ -105,7 +106,8 @@ second-brain-agent/
 │   └── 90-archive/               # encerrado / inativo
 ├── config/
 │   └── managed-paths.txt         # fronteira entre template e dados do usuário
-├── docs/                         # QUICKSTART, INSTALL, UPDATE, BACKUP, RESTORE, OPERATIONS
+├── docs/                         # QUICKSTART, INSTALL, UPDATE, BACKUP, RESTORE,
+│                                 # OPERATIONS, ENGINEERING-PRINCIPLES
 ├── scripts/
 │   ├── bootstrap.sh              # gera uma instância operacional do brain
 │   ├── install.sh                # instala a camada operacional (idempotente)
@@ -114,10 +116,13 @@ second-brain-agent/
 │   ├── backup.sh                 # brain, manifestos, metadados de versão
 │   ├── restore.sh                # restauração com confirmação e backup prévio
 │   ├── healthcheck.sh            # Nanobot, brain, permissões, n8n
+│   ├── doctor.sh                 # diagnóstico somente leitura, ponto de partida
 │   ├── validate_structure.py     # valida estrutura e ausência de secrets
 │   └── lib/common.sh             # log, dry-run, lock, validação de path
 └── tests/
-    └── run-local-tests.sh        # suíte local, em diretório temporário
+    ├── run-local-tests.sh        # suíte local, em diretório temporário
+    ├── validate_cases.py         # valida os casos conceituais das Skills
+    └── cases/                    # comportamento esperado, uma Skill por arquivo
 ```
 
 ## Ciclo de vida operacional
@@ -126,8 +131,12 @@ second-brain-agent/
 sudo ./scripts/install.sh --dry-run && sudo ./scripts/install.sh
 sudo ./scripts/update.sh  --dry-run && sudo ./scripts/update.sh
 sudo ./scripts/backup.sh
-sudo ./scripts/healthcheck.sh
+sudo ./scripts/doctor.sh            # o que está errado nesta instalação?
 ```
+
+Manutenção por uma pessoa é restrição de projeto, não fase temporária:
+os limites que impedem o sistema de crescer além disso estão em
+**[docs/ENGINEERING-PRINCIPLES.md](docs/ENGINEERING-PRINCIPLES.md)**.
 
 Atalho com tudo que importa — incluindo como baixar uma cópia do brain e
 replicar a instalação para outra máquina ou outro cliente:

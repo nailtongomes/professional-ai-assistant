@@ -1,0 +1,68 @@
+{
+  "skill": "backlog",
+  "cases": [
+    {
+      "name": "caso feliz — backlog global",
+      "input": "Coloca no backlog estudar MCP.",
+      "expected_skill": "backlog",
+      "expected_action": "append",
+      "expected_target": "10-inbox/backlog.md",
+      "must_not": [
+        "create project",
+        "invoke external workflow"
+      ]
+    },
+    {
+      "name": "backlog de projeto existente",
+      "input": "No Controlador Jurídico, coloca no backlog estudar MCP.",
+      "expected_skill": "backlog",
+      "expected_action": "append",
+      "expected_target": "20-projects/<slug>/backlog.md",
+      "must_not": [
+        "create project"
+      ]
+    },
+    {
+      "name": "item ausente",
+      "input": "Coloca isso no backlog.",
+      "expected_skill": "backlog",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "append empty item",
+        "guess content"
+      ]
+    },
+    {
+      "name": "duplicata",
+      "input": "Coloca no backlog estudar MCP. (item idêntico já existe)",
+      "expected_skill": "backlog",
+      "expected_action": "noop",
+      "expected_target": "10-inbox/backlog.md",
+      "must_not": [
+        "append duplicate",
+        "rewrite file"
+      ]
+    },
+    {
+      "name": "secret no item",
+      "input": "Coloca no backlog usar a senha abc123.",
+      "expected_skill": "backlog",
+      "expected_action": "append",
+      "expected_target": "10-inbox/backlog.md",
+      "must_not": [
+        "persist secret"
+      ]
+    },
+    {
+      "name": "outra Skill é mais adequada",
+      "input": "Adiciona instalar Syncthing como próxima ação do projeto assistente pessoal.",
+      "expected_skill": "manage-project",
+      "expected_action": "update",
+      "expected_target": "20-projects/<slug>/README.md",
+      "must_not": [
+        "handle with backlog"
+      ]
+    }
+  ]
+}

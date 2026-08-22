@@ -1,0 +1,80 @@
+{
+  "skill": "person-search",
+  "cases": [
+    {
+      "name": "caso feliz — CPF",
+      "input": "Consulta esse CPF: 000.000.000-00.",
+      "expected_skill": "person-search",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-documento",
+      "must_not": [
+        "write memory",
+        "persist identifier"
+      ]
+    },
+    {
+      "name": "OAB com UF",
+      "input": "Veja a OAB 12345/RN.",
+      "expected_skill": "person-search",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-documento",
+      "must_not": [
+        "persist identifier"
+      ]
+    },
+    {
+      "name": "OAB sem UF exigida pelo contrato",
+      "input": "Veja a OAB 12345.",
+      "expected_skill": "person-search",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "invent state",
+        "send partial payload"
+      ]
+    },
+    {
+      "name": "identificador ausente",
+      "input": "Pesquisa processos desse CNPJ.",
+      "expected_skill": "person-search",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "invent document",
+        "send request"
+      ]
+    },
+    {
+      "name": "tipo ambíguo",
+      "input": "Consulta o 12345678.",
+      "expected_skill": "person-search",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "guess document type"
+      ]
+    },
+    {
+      "name": "consulta não vira memória",
+      "input": "Depois de consultar um CPF com sucesso.",
+      "expected_skill": "person-search",
+      "expected_action": "report",
+      "expected_target": null,
+      "must_not": [
+        "write memory",
+        "persist identifier",
+        "log identifier"
+      ]
+    },
+    {
+      "name": "outra Skill é mais adequada",
+      "input": "Consulta o processo 0801234-12.2025.8.20.5001.",
+      "expected_skill": "process-query",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-processo",
+      "must_not": [
+        "handle with person-search"
+      ]
+    }
+  ]
+}

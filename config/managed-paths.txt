@@ -7,6 +7,11 @@
 # Paths são relativos à raiz do brain. Um path terminado em "/" é um
 # diretório e vale recursivamente.
 #
+# Esta lista define a categoria "managed" de brain/00-system/OWNERSHIP.md.
+# O que não está aqui é "user-owned" e nunca é tocado por update ou sync.
+# "local-managed" (assistant.env, runtime, logs, backups) não é versionado e
+# não aparece neste arquivo.
+#
 # Por que um manifesto em vez de separar 70-skills/ em managed/ e local/:
 # a separação por diretório quebraria os índices e os paths já publicados nas
 # Skills existentes, e obrigaria o usuário a decidir a categoria de cada Skill
@@ -18,6 +23,7 @@
 INDEX.md
 00-system/README.md
 00-system/PHILOSOPHY.md
+00-system/OWNERSHIP.md
 00-system/agent-rules.md
 00-system/conventions.md
 00-system/taxonomy.md
@@ -41,5 +47,16 @@ INDEX.md
 60-memory/decisions.example.md
 60-memory/lessons.example.md
 
-# --- Catálogo de automação: só o exemplo e o cabeçalho do índice ---
+# --- Skills oficiais: jurídicas e de comunicação ---
+70-skills/legal/process-query/
+70-skills/legal/person-search/
+70-skills/communication/send-email/
+
+# --- Catálogo de automação: contrato e placeholders, não o índice ---
+# O INDEX.md dos workflows é user-owned: é onde você registra os seus.
+40-resources/automation/WORKFLOW-CONTRACT.md
 40-resources/automation/workflows/exemplo-consultar-processo.md
+40-resources/automation/workflows/consultar-processo.md
+40-resources/automation/workflows/copiar-processo-integral.md
+40-resources/automation/workflows/consultar-documento.md
+40-resources/automation/workflows/enviar-email.md

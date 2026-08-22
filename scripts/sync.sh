@@ -6,6 +6,11 @@
 #
 # Nunca apaga nada. Nunca toca em arquivo fora de config/managed-paths.txt.
 # Arquivo gerenciado modificado localmente vira CONFLITO, não sobrescrita.
+#
+# Ownership (brain/00-system/OWNERSHIP.md):
+#   managed        pode sincronizar   — está no manifesto
+#   user-owned     preservar          — tudo que não está no manifesto
+#   local-managed  ignorar            — env, runtime, logs, backups; fora do brain
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
