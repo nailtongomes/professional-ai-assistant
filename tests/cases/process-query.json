@@ -1,0 +1,81 @@
+{
+  "skill": "process-query",
+  "cases": [
+    {
+      "name": "caso feliz — consulta rápida",
+      "input": "Consulta o processo 0801234-12.2025.8.20.5001.",
+      "expected_skill": "process-query",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-processo",
+      "must_not": [
+        "access court system directly",
+        "send tribunal field by inference"
+      ]
+    },
+    {
+      "name": "cópia integral usa outro workflow",
+      "input": "Pega a cópia integral do processo 0801234-12.2025.8.20.5001.",
+      "expected_skill": "process-query",
+      "expected_action": "http",
+      "expected_target": "workflow copiar-processo-integral",
+      "must_not": [
+        "report as completed on 202"
+      ]
+    },
+    {
+      "name": "número ausente",
+      "input": "Consulta o processo.",
+      "expected_skill": "process-query",
+      "expected_action": "ask",
+      "expected_target": null,
+      "must_not": [
+        "invent process number",
+        "send request"
+      ]
+    },
+    {
+      "name": "não deduzir tribunal",
+      "input": "Vê o processo 0801234-12.2025.8.20.5001 no PJe do TJRN.",
+      "expected_skill": "process-query",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-processo",
+      "must_not": [
+        "send tribunal field by inference",
+        "send sistema field by inference"
+      ]
+    },
+    {
+      "name": "workflow ainda é placeholder",
+      "input": "Consulta o processo 0801234-12.2025.8.20.5001. (workflow status placeholder)",
+      "expected_skill": "process-query",
+      "expected_action": "refuse",
+      "expected_target": null,
+      "must_not": [
+        "invoke placeholder workflow",
+        "invent endpoint"
+      ]
+    },
+    {
+      "name": "automação indisponível",
+      "input": "Consulta o processo. (automação fora do ar)",
+      "expected_skill": "process-query",
+      "expected_action": "refuse",
+      "expected_target": null,
+      "must_not": [
+        "use browser",
+        "run shell",
+        "use similar workflow"
+      ]
+    },
+    {
+      "name": "outra Skill é mais adequada",
+      "input": "Consulta esse CPF: 000.000.000-00.",
+      "expected_skill": "person-search",
+      "expected_action": "http",
+      "expected_target": "workflow consultar-documento",
+      "must_not": [
+        "handle with process-query"
+      ]
+    }
+  ]
+}

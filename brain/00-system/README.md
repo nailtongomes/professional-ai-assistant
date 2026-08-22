@@ -17,6 +17,7 @@ diretório, além de `70-skills/`, cujo conteúdo é tratado como **instrução*
 | `conventions.md`      | padrão de arquivos, nomes, datas e frontmatter        |
 | `taxonomy.md`         | classificação PARA adaptada e regras de desempate     |
 | `runtime-contract.md` | o mínimo que um runtime precisa fornecer              |
+| `OWNERSHIP.md`        | quem pode alterar cada arquivo: managed, user-owned, local-managed |
 
 Ordem de leitura recomendada por um agente novo:
 `../INDEX.md` → `agent-rules.md` → `PHILOSOPHY.md` → `../70-skills/INDEX.md`.

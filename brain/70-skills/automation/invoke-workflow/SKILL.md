@@ -145,6 +145,9 @@ Não executei. Credencial do serviço não disponível.
 
 ## Estados de execução
 
+O formato completo de resposta está em
+`40-resources/automation/WORKFLOW-CONTRACT.md` — este é o resumo operacional.
+
 ```text
 requested → accepted → queued → running → completed | failed
 ```

@@ -160,6 +160,45 @@ if [[ -d "$CLONE/.git" ]]; then
     env REPO_DIR="$CLONE" BACKUP_DIR=/proc/nao-existe "$CLONE/scripts/update.sh" --skip-nanobot
 fi
 
+printf '\n== doctor ==\n'
+# 0 = ok, 1 = degradado (sem nanobot na sandbox), 2 = erro. Só 2 reprova.
+# A sandbox tem uma Skill local não registrada no índice (criada acima, de
+# propósito): o doctor precisa detectar isso e sair 2.
+# O `if` é necessário: com `set -e`, capturar $? depois do comando aborta a suíte.
+run_doctor() {
+  if "$REPO/scripts/doctor.sh" --skip-network >"$TMP/doctor.out" 2>&1; then
+    echo 0
+  else
+    echo $?
+  fi
+}
+rc="$(run_doctor)"
+[[ "$rc" == "2" ]] && ok "doctor detecta brain estruturalmente inválido" \
+                   || bad "doctor deveria sair 2 com Skill não indexada (saiu $rc)"
+grep -q "Structure.*ERROR" "$TMP/doctor.out" \
+  && ok "doctor aponta a área com problema" || bad "doctor não apontou Structure"
+
+# Com o brain íntegro, no máximo avisos (sem nanobot real, sem rede).
+rm -rf "$BRAIN/70-skills/local"
+rc="$(run_doctor)"
+[[ "$rc" != "2" ]] && ok "doctor --skip-network roda em brain íntegro (exit $rc)" \
+                   || { bad "doctor saiu 2 em brain íntegro"; sed 's/^/    /' "$TMP/doctor.out"; }
+grep -q "Nanobot" "$TMP/doctor.out" && ok "doctor reporta estado do Nanobot" || bad "sem linha de Nanobot"
+grep -qE "N8N_BASE_URL: (configured|missing)" <("$REPO/scripts/doctor.sh" --skip-network --verbose 2>&1 || true) \
+  && ok "doctor mostra config sem imprimir valor" || bad "config não reportada"
+check "doctor é somente leitura"        bash -c '
+  before=$(find "$1" -type f | wc -l)
+  "$0/scripts/doctor.sh" --skip-network >/dev/null 2>&1 || true
+  after=$(find "$1" -type f | wc -l)
+  [ "$before" = "$after" ]' "$REPO" "$BRAIN"
+# Sem brain, doctor precisa sair 2 (erro), não 0.
+check_fails "doctor falha sem brain" \
+  env ASSISTANT_PREFIX="$TMP/vazio" "$REPO/scripts/doctor.sh" --skip-network
+
+printf '\n== casos conceituais ==\n'
+check "validate_cases"                  python3 "$REPO/tests/validate_cases.py"
+check "validate_cases --strict"         python3 "$REPO/tests/validate_cases.py" --strict
+
 printf '\n== segurança ==\n'
 # Ignora comentários: o que importa é o código executável.
 code_only() { grep -rhv '^[[:space:]]*#' "$REPO"/scripts/*.sh "$REPO"/scripts/lib/*.sh; }

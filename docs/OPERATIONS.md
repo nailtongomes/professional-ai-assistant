@@ -3,6 +3,46 @@
 Referência do dia a dia: o que cada script faz, o que é gerenciado, e o que
 ainda não foi feito de propósito.
 
+## Solo operator routine
+
+O sistema é mantido por uma pessoa. Duas rotinas bastam.
+
+### Antes de atualizar
+
+```bash
+sudo ./scripts/doctor.sh          # o estado está sadio?
+sudo ./scripts/backup.sh          # rede de segurança
+sudo ./scripts/update.sh --dry-run
+sudo ./scripts/update.sh
+sudo ./scripts/doctor.sh          # continua sadio?
+```
+
+O `update.sh` já faz backup sozinho — o backup explícito antes existe para o
+caso de você querer o ponto de retorno mesmo se decidir não atualizar.
+
+### Quando algo falhar
+
+```bash
+sudo ./scripts/doctor.sh --verbose        # ponto de partida único
+ls /var/log/professional-ai-assistant/    # logs
+# task_id da execução, quando houver, para rastrear na automação
+```
+
+Restaure **somente se necessário** — `docs/RESTORE.md`. Restore é a última
+opção, não a primeira: quase toda falha é configuração ausente ou serviço fora
+do ar, e o `doctor` diz qual.
+
+### Ritmo sugerido
+
+| Quando | O quê |
+| ------ | ----- |
+| ao mexer no sistema | `doctor.sh` antes e depois |
+| semanal | `doctor.sh`; conferir idade do último backup |
+| ao alterar Skill | `tests/validate_cases.py` |
+| mensal | ler `docs/ENGINEERING-PRINCIPLES.md` e perguntar o que dá para remover |
+
+Se essa rotina começar a crescer, o problema é o sistema, não o runbook.
+
 ## Scripts
 
 | Script | Faz | Root | `--dry-run` |
@@ -14,6 +54,7 @@ ainda não foi feito de propósito.
 | `restore.sh` | substitui o brain a partir de um backup | sim | sim |
 | `healthcheck.sh` | Nanobot, brain, permissões, n8n | não | n/a |
 | `bootstrap.sh` | cria um brain novo a partir do template | não | sim |
+| `doctor.sh` | diagnóstico somente leitura; não corrige nada | não | n/a |
 
 Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 
@@ -23,10 +64,29 @@ Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 `/var/lock/professional-ai-assistant.lock`. Só um por vez. Sem `flock` no
 sistema, seguem com aviso.
 
+## Diagnóstico
+
+```bash
+sudo ./scripts/doctor.sh                 # 0 ok | 1 degradado | 2 erro
+sudo ./scripts/doctor.sh --skip-network  # sem nenhuma chamada HTTP
+sudo ./scripts/doctor.sh --verbose       # detalhe por verificação
+```
+
+Somente leitura: não corrige, não altera permissão, não imprime valor de secret
+— apenas `configured` ou `missing` por variável.
+
+Verifica repositório (branch, commit, working tree), brain e arquivos
+essenciais, paths do manifesto, permissão de escrita nas áreas do usuário,
+scripts presentes e executáveis, Nanobot e versão, `assistant.env` e permissão,
+health da automação, idade do último backup, e `validate_structure.py`.
+
+Antes do deploy, Nanobot ausente é **aviso**, não erro.
+
 ## Arquivos gerenciados vs. dados do usuário
 
 `config/managed-paths.txt` é a fronteira. Só o que está listado ali pode ser
-tocado por um update.
+tocado por um update. A política completa — quem altera o quê — está em
+`brain/00-system/OWNERSHIP.md`.
 
 | Gerenciado (o template atualiza) | Do usuário (nunca tocado) |
 | -------------------------------- | ------------------------- |

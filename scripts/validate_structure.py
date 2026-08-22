@@ -31,6 +31,7 @@ REQUIRED_FILES = (
     "00-system/README.md",
     "00-system/agent-rules.md",
     "00-system/PHILOSOPHY.md",
+    "00-system/OWNERSHIP.md",
     "00-system/conventions.md",
     "00-system/taxonomy.md",
     "00-system/runtime-contract.md",
@@ -69,7 +70,8 @@ MAX_SCAN_BYTES = 1_000_000
 SKILL_CATEGORY_SKIP = {"README.md", "INDEX.md"}
 
 # Nomes convencionais em maiúsculas, aceitos por exceção.
-RESERVED_NAMES = {"README.md", "INDEX.md", "SKILL.md", "PHILOSOPHY.md", ".gitkeep"}
+RESERVED_NAMES = {"README.md", "INDEX.md", "SKILL.md", "PHILOSOPHY.md",
+                  "OWNERSHIP.md", "WORKFLOW-CONTRACT.md", ".gitkeep"}
 
 
 def _iter_files(brain: Path):
