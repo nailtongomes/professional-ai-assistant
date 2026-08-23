@@ -1,0 +1,13 @@
+{
+  "scenario": "01-add-backlog",
+  "input": "Coloca no backlog estudar MCP.",
+  "expected_skill": "backlog",
+  "expected_action": "append",
+  "expected_target": "10-inbox/backlog.md",
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}

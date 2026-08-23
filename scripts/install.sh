@@ -165,10 +165,23 @@ elif [[ $sync_rc -ne 0 ]]; then
 fi
 
 # 9. runtime -----------------------------------------------------------------
+RUNTIME="$(selected_runtime)"
+log "runtime selecionado: ${RUNTIME}"
+ensure_dir "$(runtime_state_dir)" 0750 "${ASSISTANT_USER}:${ASSISTANT_USER}" >/dev/null
+ensure_dir "$(runtime_log_dir)" 0750 "${ASSISTANT_USER}:${ASSISTANT_USER}" >/dev/null
 # TRUST BOUNDARY: o instalador oficial é código remoto de terceiro. Aqui ele é
 # baixado para arquivo, verificado em dry-run e só então executado — nunca
 # canalizado direto para o shell. Ver docs/INSTALL.md.
-if [[ "$SKIP_NANOBOT" == "1" ]]; then
+if [[ "$RUNTIME" != "nanobot" ]]; then
+  # Adapter alternativo cuida da instalação do próprio runtime.
+  adapter_install="$(runtime_adapter_dir)/install.sh"
+  if [[ -x "$adapter_install" ]]; then
+    install_args=(); is_dry_run && install_args+=(--dry-run)
+    "$adapter_install" "${install_args[@]}" || die "instalação do runtime ${RUNTIME} falhou"
+  else
+    die "adapter de runtime não encontrado para ${RUNTIME}"
+  fi
+elif [[ "$SKIP_NANOBOT" == "1" ]]; then
   log "instalação do Nanobot pulada (--skip-nanobot)"
 elif NB="$(nanobot_bin 2>/dev/null)"; then
   log "Nanobot já instalado: ${NB} ($("$NB" --version 2>/dev/null | head -n1 || echo '?'))"

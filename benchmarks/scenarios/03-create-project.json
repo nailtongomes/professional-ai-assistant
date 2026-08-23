@@ -1,0 +1,13 @@
+{
+  "scenario": "03-create-project",
+  "input": "Crie um projeto para colocar meu assistente pessoal em produção.",
+  "expected_skill": "manage-project",
+  "expected_action": "create",
+  "expected_target": "20-projects/",
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}

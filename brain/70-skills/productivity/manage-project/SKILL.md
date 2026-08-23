@@ -1,6 +1,8 @@
 ---
 type: skill
 name: manage-project
+description: >
+  Gerencia criação, consulta, estado, backlog, decisões e notas de projetos.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

@@ -25,6 +25,10 @@ ASSISTANT_SAFE_ROOTS=(
 )
 
 : "${DRY_RUN:=0}"
+
+# Runtime ativo. Configuração explícita vence — nunca detecção de binário:
+# um binário instalado por acidente não deve mudar quem opera o assistente.
+: "${ASSISTANT_RUNTIME:=nanobot}"
 : "${ASSISTANT_USER:=assistant}"
 
 # ------------------------------------------------------------------ log ----
@@ -179,6 +183,25 @@ nanobot_version() {
   local bin
   bin="$(nanobot_bin)" || { echo "not-installed"; return 1; }
   "$bin" --version 2>/dev/null | head -n1 || echo "unknown"
+}
+
+# Valida o runtime selecionado e devolve o nome. Valor desconhecido é erro.
+selected_runtime() {
+  case "${ASSISTANT_RUNTIME:-nanobot}" in
+    nanobot|hermes) printf '%s\n' "${ASSISTANT_RUNTIME:-nanobot}" ;;
+    *) die "ASSISTANT_RUNTIME inválido: ${ASSISTANT_RUNTIME} (use nanobot ou hermes)" ;;
+  esac
+}
+
+# Estado e logs nunca são compartilhados entre runtimes.
+runtime_state_dir() { printf '%s/%s\n' "$RUNTIME_DIR" "$(selected_runtime)"; }
+runtime_log_dir()   { printf '%s/%s\n' "$LOG_DIR" "$(selected_runtime)"; }
+
+# Diretório do adapter do runtime ativo, quando existir.
+runtime_adapter_dir() {
+  local dir
+  dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/runtime-adapters/$(selected_runtime)"
+  [[ -d "$dir" ]] && printf '%s\n' "$dir"
 }
 
 assistant_home() {

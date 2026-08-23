@@ -1,6 +1,8 @@
 ---
 type: skill
 name: agenda
+description: >
+  Gerencia compromissos pessoais e profissionais armazenados em Markdown.
 status: active
 created: 2026-08-21
 updated: 2026-08-21

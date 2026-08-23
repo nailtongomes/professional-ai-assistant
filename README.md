@@ -30,7 +30,7 @@ Separar as camadas e deixar apenas a última descartável:
 | `skills`  | `brain/70-skills/`     | não — é seu   |
 | `data`    | `brain/60-memory/` e demais diretórios | não — é seu |
 | `tools`   | nomes conceituais em `brain/00-system/runtime-contract.md` | implementação sim, contrato não |
-| `runtime` | fora do repositório    | **sim, totalmente** |
+| `runtime` | fora do repositório; adapter fino em `runtime-adapters/` | **sim, totalmente** |
 | `secrets` | ambiente / secret manager (`.env`, nunca versionado) | sim — e nunca dentro de `brain/` |
 
 As quatro camadas nunca se misturam no disco: `brain/` é versionado e portátil;
@@ -104,6 +104,8 @@ second-brain-agent/
 │   │   ├── productivity/{manage-project,backlog,agenda}/
 │   │   └── automation/invoke-workflow/
 │   └── 90-archive/               # encerrado / inativo
+├── runtime-adapters/             # Nanobot (padrão) e Hermes, adapters finos
+├── benchmarks/                   # cenários neutros para comparar runtimes
 ├── config/
 │   └── managed-paths.txt         # fronteira entre template e dados do usuário
 ├── docs/                         # QUICKSTART, INSTALL, UPDATE, BACKUP, RESTORE,

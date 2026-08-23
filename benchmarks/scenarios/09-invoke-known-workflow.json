@@ -1,0 +1,13 @@
+{
+  "scenario": "09-invoke-known-workflow",
+  "input": "Dispara o workflow de relatório. (registrado e ativo)",
+  "expected_skill": "invoke-workflow",
+  "expected_action": "http",
+  "expected_target": "registered workflow endpoint",
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}

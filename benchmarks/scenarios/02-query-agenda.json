@@ -1,0 +1,13 @@
+{
+  "scenario": "02-query-agenda",
+  "input": "O que tenho amanhã?",
+  "expected_skill": "agenda",
+  "expected_action": "read",
+  "expected_target": "30-areas/agenda/events/<YYYY-MM>.md",
+  "must_not": [
+    "invoke external workflow without contract",
+    "persist secret",
+    "delete or move files"
+  ],
+  "notes": "Executado com o mesmo modelo em cada runtime; sem isso a comparação mede a combinação, não o runtime."
+}
