@@ -368,7 +368,65 @@ for skill in Path(sys.argv[1], "brain/70-skills").rglob("SKILL.md"):
 sys.exit(1 if bad else 0)
 PYEOF
 
+printf '\n== deploy / VPS ==\n'
+CL="$TMP/changelog.md"
+
+check "changelog registra entrada"      env CHANGELOG_FILE="$CL" "$REPO/scripts/changelog.sh" "deploy inicial do runtime"
+check "changelog é append-only" bash -c '
+  before=$(wc -l < "$1")
+  CHANGELOG_FILE="$1" "$0/scripts/changelog.sh" "segunda mudança registrada" >/dev/null
+  after=$(wc -l < "$1")
+  [ "$after" -gt "$before" ] && grep -q "deploy inicial" "$1"' "$REPO" "$CL"
+check_fails "changelog recusa descrição vazia" env CHANGELOG_FILE="$CL" "$REPO/scripts/changelog.sh" "curta"
+check "changelog --list funciona"       env CHANGELOG_FILE="$CL" "$REPO/scripts/changelog.sh" --list
+
+# Layout /opt: os scripts precisam operar com BRAIN_DIR sobrescrito.
+check "BRAIN_DIR=/opt/brain é aceito" bash -c '
+  export BRAIN_DIR=/opt/brain
+  . "$0/scripts/lib/common.sh"
+  assert_safe_path /opt/brain/60-memory' "$REPO"
+check_fails "path fora do brain segue recusado" bash -c '
+  export BRAIN_DIR=/opt/brain
+  . "$0/scripts/lib/common.sh"
+  assert_safe_path /opt/outra-coisa' "$REPO"
+
+# compose: válido, sem porta publicada, sem volume nomeado, imagem obrigatória
+check "compose sem ports publicadas" bash -c '! grep -qE "^\s*ports:" "$0/deploy/docker-compose.yml"' "$REPO"
+check "compose sem volumes nomeados" bash -c '! grep -qE "^volumes:" "$0/deploy/docker-compose.yml"' "$REPO"
+check "compose exige RUNTIME_IMAGE"   bash -c 'grep -q "RUNTIME_IMAGE:?" "$0/deploy/docker-compose.yml"' "$REPO"
+check "compose monta /opt/brain"      bash -c 'grep -q "/opt/brain:/brain" "$0/deploy/docker-compose.yml"' "$REPO"
+check "compose sem privilégio extra"  bash -c 'grep -q "no-new-privileges:true" "$0/deploy/docker-compose.yml"' "$REPO"
+if command -v docker >/dev/null 2>&1; then
+  check "docker compose config valida" bash -c '
+    d="$(mktemp -d)"; cp "$0/deploy/docker-compose.yml" "$d/"
+    : > "$d/assistant.env"
+    sed -i "s|/etc/professional-ai-assistant/assistant.env|$d/assistant.env|" "$d/docker-compose.yml"
+    cd "$d" && RUNTIME_IMAGE=exemplo:tag docker compose config -q' "$REPO"
+  check_fails "compose falha sem RUNTIME_IMAGE" bash -c '
+    d="$(mktemp -d)"; cp "$0/deploy/docker-compose.yml" "$d/"
+    : > "$d/assistant.env"
+    sed -i "s|/etc/professional-ai-assistant/assistant.env|$d/assistant.env|" "$d/docker-compose.yml"
+    cd "$d" && docker compose config -q' "$REPO"
+else
+  printf '  SKIP  docker não instalado (validação de compose)\n'
+fi
+
+# regras de operação presentes e sem valor privado
+check "CLAUDE.md lista comandos proibidos" bash -c '
+  grep -q "docker system prune --volumes" "$0/CLAUDE.md" \
+  && grep -q "docker volume rm" "$0/CLAUDE.md" \
+  && grep -q "/opt/brain/memory" "$0/CLAUDE.md"' "$REPO"
+check "CLAUDE.md exige confirmação explícita" \
+  bash -c 'grep -qi "aguardar confirmação" "$0/CLAUDE.md"' "$REPO"
+check "regra de dependência documentada" bash -c '
+  grep -q "brain    ──nunca" "$0/CLAUDE.md" && grep -q "brain    ──nunca" "$0/deploy/README.md"' "$REPO"
+check "troca de runtime alerta sobre schema" \
+  bash -c 'grep -qi "migram sozinhas" "$0/deploy/README.md"' "$REPO"
+check_fails "nenhum secret no deploy/" bash -c '
+  grep -rnE "^(RUNTIME_IMAGE|ASSISTANT_RUNTIME)=.+" "$0/deploy/vps.env.example" | grep -vE "=nanobot$" | grep -q .' "$REPO"
+
 printf '\n== casos conceituais ==\n'
+
 
 check "validate_cases"                  python3 "$REPO/tests/validate_cases.py"
 check "validate_cases --strict"         python3 "$REPO/tests/validate_cases.py" --strict
@@ -379,6 +437,15 @@ code_only() { grep -rhv '^[[:space:]]*#' "$REPO"/scripts/*.sh "$REPO"/scripts/li
 export -f code_only
 # O repositório é público: nenhum domínio, endpoint ou webhook privado pode
 # estar versionado. A allowlist cobre só o que é público e legítimo.
+# Hostname sem esquema também vaza infraestrutura: o teste anterior só olhava
+# URLs com http(s):// e deixou passar um "tests.exemplo.com" solto.
+check_fails "nenhum domínio privado em texto" bash -c '
+  grep -rhIoE "\\b[a-z0-9-]+\\.[a-z0-9-]+\\.(com|net|org|io|dev|app|br)\\b" \
+    "$0/scripts" "$0/config" "$0/brain" "$0/docs" "$0/deploy" "$0/CLAUDE.md" \
+    "$0/.env.example" 2>/dev/null \
+  | sort -u \
+  | grep -vE "^(raw\\.githubusercontent\\.com|hermes-agent\\.nousresearch\\.com|automation\\.example\\.com|[a-z-]+\\.example\\.com)$" \
+  | grep -q .' "$REPO"
 check_fails "nenhum host privado versionado" bash -c '
   grep -rhoE "https?://[A-Za-z0-9.-]+" "$0"/scripts "$0"/config "$0"/brain "$0"/docs "$0"/.env.example 2>/dev/null \
     | sort -u \
