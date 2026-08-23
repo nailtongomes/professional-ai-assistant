@@ -65,6 +65,17 @@ Todos são idempotentes. `install.sh` dez vezes converge para o mesmo estado.
 `/var/lock/professional-ai-assistant.lock`. Só um por vez. Sem `flock` no
 sistema, seguem com aviso.
 
+## Deploy e operação da VPS
+
+Layout `/opt`, compose do runtime, changelog e as regras de comando destrutivo:
+`deploy/README.md` e `docs/VPS-OPERATIONS.md`. As regras curtas para quem opera
+estão em `CLAUDE.md`, na raiz.
+
+```text
+runtime  ──referencia──►  brain      (volume mount)
+brain    ──nunca──────►  runtime
+```
+
 ## Runtime ativo
 
 ```env

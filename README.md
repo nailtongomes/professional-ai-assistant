@@ -104,6 +104,8 @@ second-brain-agent/
 │   │   ├── productivity/{manage-project,backlog,agenda}/
 │   │   └── automation/invoke-workflow/
 │   └── 90-archive/               # encerrado / inativo
+├── CLAUDE.md                     # regras de operação (VPS, comandos destrutivos)
+├── deploy/                       # docker-compose e layout /opt da VPS
 ├── runtime-adapters/             # Nanobot (padrão) e Hermes, adapters finos
 ├── benchmarks/                   # cenários neutros para comparar runtimes
 ├── config/

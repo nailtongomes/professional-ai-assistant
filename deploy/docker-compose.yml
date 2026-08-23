@@ -1,0 +1,51 @@
+# Runtime do assistente na VPS. Copiado para /opt/runtime/docker-compose.yml.
+#
+#   docker compose config          # valida sem subir nada
+#   docker compose up -d
+#   docker compose down
+#
+# O runtime referencia o brain por volume. O brain nunca referencia o runtime.
+
+services:
+  agent:
+    # SEM DEFAULT DE PROPÓSITO: nenhuma imagem oficial foi confirmada para os
+    # runtimes suportados. Defina RUNTIME_IMAGE no .env do diretório —
+    # `docker compose config` falha se estiver vazio, que é o comportamento
+    # desejado: melhor falhar do que subir uma imagem que ninguém escolheu.
+    image: ${RUNTIME_IMAGE:?defina RUNTIME_IMAGE no /opt/runtime/.env}
+    container_name: ${RUNTIME_NAME:-assistant-agent}
+    restart: unless-stopped
+
+    env_file:
+      - /etc/professional-ai-assistant/assistant.env
+
+    volumes:
+      # Dados canônicos. Leitura e escrita: o agente cria notas e registros.
+      - /opt/brain:/brain
+      # Configuração do runtime: descartável, reconstruível pelo adapter.
+      - /opt/runtime/config:/config
+      # Logs por runtime, nunca compartilhados.
+      - /var/log/professional-ai-assistant/${ASSISTANT_RUNTIME:-nanobot}:/logs
+
+    environment:
+      BRAIN_DIR: /brain
+      ASSISTANT_RUNTIME: ${ASSISTANT_RUNTIME:-nanobot}
+
+    # Sem `ports:` de propósito. Nada é exposto até existir reverse proxy com
+    # TLS e autenticação (docs/OPERATIONS.md). Publicar porta aqui é o atalho
+    # que transforma um assistente pessoal em serviço aberto.
+
+    # Least privilege: o container não precisa de root nem de novos privilégios.
+    user: ${RUNTIME_UID:-1000}:${RUNTIME_GID:-1000}
+    security_opt:
+      - no-new-privileges:true
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Sem `volumes:` nomeados: todo estado que importa está em bind mount sob
+# /opt/brain, visível e copiável sem Docker. Volume nomeado é estado que só o
+# Docker sabe onde está — e some com um `docker volume rm` distraído.
