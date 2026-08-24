@@ -33,7 +33,7 @@ PJe, preparar palestra, lançar produto, migrar um sistema.
 
 ### O que não é projeto
 
-Responsabilidade contínua, sem fim previsto: N3 Wizards, desenvolvimento
+Responsabilidade contínua, sem fim previsto: a própria empresa, desenvolvimento
 profissional, financeiro, estudos, advocacia. Isso pertence a `30-areas/`.
 O teste é simples: se não existe um estado "pronto" reconhecível, é área.
 

@@ -49,6 +49,24 @@ When to use:
 | `legal/`      | processos judiciais e consultas por identificador |
 | `communication/` | e-mail e demais canais de saída              |
 
+## Catálogos
+
+Classificação transversal às categorias acima. Ela não muda caminho de arquivo
+algum — existe para responder a uma pergunta só: *esta Skill pode ser
+distribuída a uma instalação de terceiro?*
+
+| Catálogo | Distribuível | Exemplos |
+| --- | --- | --- |
+| **Core** | sim, a qualquer instância | `organize-brain`, `manage-project`, `backlog`, `agenda` |
+| **Legal Service** | sim, se o serviço estiver contratado | `process-query`, `person-search`, `send-email` |
+| **Owner/Developer** | **não** — só do mantenedor | infraestrutura, backend, operações internas |
+
+Nenhuma Skill do terceiro catálogo existe hoje. A regra está registrada antes da
+primeira, que é quando ela ainda é barata: uma Skill de operação interna nunca
+acompanha a instalação de um cliente.
+
+Contexto em `docs/PRODUCT-VISION.md`.
+
 ## Skills registradas
 
 ## organize-brain
