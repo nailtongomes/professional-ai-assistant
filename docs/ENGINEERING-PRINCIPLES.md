@@ -92,6 +92,18 @@ Fora do fluxo de execução, mas parte do sistema:
 Não misture. Syncthing replica o erro; Git não guarda o seu brain; backup não
 está online quando você precisa do arquivo agora.
 
+## Comercialização não suspende estas regras
+
+A visão de produto (`PRODUCT-VISION.md`) prevê distribuir esta arquitetura a
+clientes externos. Isso não afrouxa nada acima. A pergunta que filtra qualquer
+componente que só exista para vender é:
+
+> Precisamos disso para o **primeiro** cliente?
+
+Se não, adiar. Um mantenedor só não sustenta control plane, billing próprio,
+IAM próprio, marketplace ou provisionamento massivo — e nenhum deles é
+necessário para o cliente número um.
+
 ## Não implementar
 
 ```text

@@ -464,5 +464,20 @@ check      "todo script usa set -Eeuo pipefail" bash -c '
     grep -q "set -Eeuo pipefail" "$f" || exit 1
   done' "$REPO"
 
+printf '\n== fronteiras de produto ==\n'
+check "PRODUCT-VISION.md existe"        test -f "$REPO/docs/PRODUCT-VISION.md"
+check "cenarios de produto existem"     test -f "$REPO/tests/PRODUCT-SCENARIOS.md"
+check "README aponta a visao"           grep -q "docs/PRODUCT-VISION.md" "$REPO/README.md"
+check "indice classifica catalogos"     grep -q "Owner/Developer" "$REPO/brain/70-skills/INDEX.md"
+check "contrato exige dado minimo"      grep -q "Dado mínimo necessário" \
+  "$REPO/brain/40-resources/automation/WORKFLOW-CONTRACT.md"
+# Portabilidade (PRODUCT-VISION.md §8): procedimento distribuível não cita o dono.
+check_fails "identidade do mantenedor em Skill" bash -c '
+  grep -rniE "n3 wizards|n3wizards|nailton" "$0"/brain/70-skills | grep -q .' "$REPO"
+# Single-tenant (§3): nada de identificador de tenant no brain ou nos scripts.
+check_fails "identificador de tenant versionado" bash -c '
+  grep -rniE "tenant_id|tenant-id|multi-tenant|multitenan" \
+    "$0"/brain "$0"/scripts "$0"/config 2>/dev/null | grep -q .' "$REPO"
+
 printf '\n== resultado ==\n  %d passaram, %d falharam\n\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]

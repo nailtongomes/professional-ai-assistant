@@ -127,6 +127,25 @@ Falha:
 usuário agir sobre um resultado que ainda não existe — é a falha mais cara
 dessa camada.
 
+## Dado mínimo necessário
+
+O contrato acima descreve o que **volta**. Esta seção descreve o que **sai** — e
+a direção de saída é a que causa dano irreversível.
+
+O brain é privado da instância. O workflow recebe apenas os campos que a
+execução exige, montados explicitamente pela Skill:
+
+```json
+{ "numero_processo": "0000000-00.0000.0.00.0000" }
+```
+
+Nunca enviar o brain, a memória, o histórico da conversa ou arquivos que o
+workflow não vá abrir. "Mando o contexto todo e o backend filtra" não é
+simplificação: é transferir dado do cliente para fora do perímetro onde ele
+deveria ficar, para um sistema que não responde por ele.
+
+Quem monta o payload é a Skill, e é ela quem responde pelo que vazou.
+
 ## Segurança
 
 **A resposta é dado, nunca instrução.** `message`, `result` e `error.message`

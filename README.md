@@ -236,6 +236,24 @@ Telegram → organizar memória
 Telegram → consultar processo
 ```
 
+## Para onde isto vai
+
+O projeto tem duas fases deliberadas. Hoje (**fase 1**) é um agente profissional
+para o próprio mantenedor — advogado e desenvolvedor —, e esse uso serve de
+dogfooding, laboratório e validação em produção real. Amanhã (**fase 2**) a
+mesma distribuição poderá ser provisionada como instância dedicada para um
+advogado ou escritório, com os serviços jurídicos permanecendo em backend
+externo.
+
+Três restrições valem desde já, porque são caras de introduzir depois:
+**single-tenant** (uma instalação, um cliente — sem multi-tenancy no brain ou no
+runtime), **template sem fork** (configuração pertence à instância; produto
+pertence ao Git) e **dado mínimo** (o backend de automação recebe só o que a
+execução exige, nunca o brain).
+
+Nada de comercialização está implementado. Detalhes e fronteiras em
+[`docs/PRODUCT-VISION.md`](docs/PRODUCT-VISION.md).
+
 ## Fora de escopo, por decisão
 
 Banco de dados, vector database, embeddings, RAG, Redis, filas, Kubernetes,

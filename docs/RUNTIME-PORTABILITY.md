@@ -68,6 +68,20 @@ allowlists e chaves de outro assistente.
 para quem guardou os dados dentro do harness antigo; nós nunca guardamos. Se um
 dia usarmos, será por conveniência pontual — nunca como pilar da arquitetura.
 
+## Runtime não entra no produto
+
+A substituibilidade tem uma consequência comercial, registrada em
+`PRODUCT-VISION.md`: o produto chama-se Professional AI Assistant, e o nome do
+runtime não aparece na promessa nem no contrato com o cliente. Nanobot continua
+o padrão; Hermes continua suportado; um terceiro pode entrar.
+
+Isso também é o que torna honesta a comparação entre candidatos por custo,
+tokens, latência, estabilidade, manutenção e qualidade de tool calling — medição
+que não vale nada se um deles já estiver entranhado no produto.
+
+O mesmo vale para o modelo: o provedor de LLM é configuração da instância, nunca
+identidade do produto.
+
 ## Teste de portabilidade
 
 Três perguntas, todas com resposta obrigatória "sim":
