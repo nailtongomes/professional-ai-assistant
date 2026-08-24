@@ -7,12 +7,16 @@
 set -Eeuo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PASS=0; FAIL=0
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-ok()   { printf '  PASS  %s\n' "$*"; PASS=$((PASS+1)); }
-bad()  { printf '  FAIL  %s\n' "$*" >&2; FAIL=$((FAIL+1)); }
+# Contadores em arquivo, não em variável: parte das verificações roda dentro de
+# subshell, e incremento de variável não atravessa subshell — o placar ficava
+# menor que a realidade e uma falha lá dentro não reprovava a suíte.
+TALLY="$TMP/tally"; : > "$TALLY"
+
+ok()   { printf '  PASS  %s\n' "$*"; echo PASS >> "$TALLY"; }
+bad()  { printf '  FAIL  %s\n' "$*" >&2; echo FAIL >> "$TALLY"; }
 # Roda em subshell: die() chama exit e não pode derrubar o test runner.
 check(){ local d="$1"; shift; if ( "$@" ) >/dev/null 2>&1; then ok "$d"; else bad "$d"; fi; }
 check_fails(){ local d="$1"; shift; if ( "$@" ) >/dev/null 2>&1; then bad "$d"; else ok "$d"; fi; }
@@ -51,7 +55,8 @@ printf '\n== validação de path (common.sh) ==\n'
   check_fails "recusa .."                assert_safe_path "$BRAIN/../../etc"
   check      "aceita dentro do brain"    assert_safe_path "$BRAIN/nota.md"
   check_fails "recusa remover a raiz"    safe_remove "$BRAIN"
-  exit 0 )
+  # Sem `exit 0` mascarando: as falhas já foram registradas em $TALLY.
+  true )
 
 printf '\n== dry-run: install ==\n'
 check "install --dry-run" "$REPO/scripts/install.sh" --dry-run --skip-nanobot
@@ -479,5 +484,7 @@ check_fails "identificador de tenant versionado" bash -c '
   grep -rniE "tenant_id|tenant-id|multi-tenant|multitenan" \
     "$0"/brain "$0"/scripts "$0"/config 2>/dev/null | grep -q .' "$REPO"
 
+PASS=$(grep -c '^PASS$' "$TALLY" || true)
+FAIL=$(grep -c '^FAIL$' "$TALLY" || true)
 printf '\n== resultado ==\n  %d passaram, %d falharam\n\n' "$PASS" "$FAIL"
 [[ $FAIL -eq 0 ]]
