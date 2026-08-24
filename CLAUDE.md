@@ -65,11 +65,34 @@ no deploy. Registrar depois da mudança dar certo, não antes.
 
 ## Layout da VPS
 
+Há **dois** perfis de deploy, e confundi-los é a origem mais provável de erro
+operacional. O que decide qual está em uso é o que existe na máquina, não a
+memória de quem opera.
+
+**Nativo — padrão do MVP.** É o que `scripts/install.sh` monta, e os caminhos
+são os defaults de `scripts/lib/common.sh`:
+
 ```text
-/opt/brain/          dados canônicos — brain, memória, skills   (nunca apagar)
-/opt/runtime/        docker-compose.yml do agente ativo         (descartável)
-/opt/files/          changelog.md e utilitários operacionais
+/opt/professional-ai-assistant/repo/     checkout controlado     (descartável)
+/srv/professional-ai-assistant/brain/    dados canônicos         (nunca apagar)
+/var/lib/professional-ai-assistant/      runtime/ e data/        (descartável)
+/etc/professional-ai-assistant/          assistant.env, chmod 600
+/var/log/professional-ai-assistant/      logs
+/var/backups/professional-ai-assistant/  backups
 ```
+
+**Docker — alternativa.** Descrito em `deploy/`, com o brain em `/opt/brain` e
+o compose em `/opt/runtime`. Não é o caminho do primeiro MVP.
+
+Antes de qualquer comando que dependa de caminho, confirme o perfil:
+
+```bash
+test -d /srv/professional-ai-assistant/brain && echo nativo
+test -d /opt/brain && echo docker
+```
+
+O diretório do brain — qualquer que seja o perfil — é o único que não se
+reconstrói a partir do Git.
 
 Regra de dependência, em uma direção só:
 
