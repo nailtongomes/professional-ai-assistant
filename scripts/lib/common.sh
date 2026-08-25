@@ -146,7 +146,10 @@ acquire_lock() {
     warn "flock ausente: seguindo sem trava de concorrência"
     return 0
   fi
-  ensure_dir "$(dirname "$LOCK_FILE")" 0755 >/dev/null 2>&1 || true
+  # O diretório do lock é path de sistema (/var/lock), fora das raízes
+  # gerenciadas: ensure_dir aborta nele via assert_safe_path. Como die()
+  # faz exit, o "|| true" não segurava e install.sh morria em silêncio.
+  mkdir -p -- "$(dirname "$LOCK_FILE")" 2>/dev/null || true
   exec 9>"$LOCK_FILE" || die "não foi possível abrir o lock: $LOCK_FILE"
   flock -n 9 || die "outra operação em andamento (lock: $LOCK_FILE)"
   log "lock adquirido por ${who}"
